@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Phỏng vấn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #4f46e5;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .modal-base {
+            transition: visibility 0.3s, opacity 0.3s;
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .modal-base.visible-custom {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-box {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+        }
+        .modal-base:not(.visible-custom) .modal-box {
+            transform: scale(0.9) translateY(20px);
+            opacity: 0;
+        }
+
+        .fc { --fc-border-color: #f3f4f6; --fc-button-bg-color: #4f46e5; --fc-button-border-color: #4f46e5; }
+        .fc-event { cursor: pointer; padding: 4px 8px; border-radius: 6px; font-weight: 600; border: none !important; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #818cf8; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-900">
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start mb-6 gap-4">
+            <div class="text-left">
+                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight text-indigo-600">HR Interview Pro</h1>
+                <p class="text-gray-500 mt-1 flex items-center">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></span>
+                    Hệ thống quản lý ứng viên thông minh
+                </p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <button onclick="openCalendarModal()" class="bg-white hover:bg-gray-50 text-gray-700 font-bold py-3 px-5 rounded-2xl transition-all shadow-sm border border-gray-200 flex items-center">
+                    <i class="fas fa-calendar-alt mr-2 text-indigo-600"></i> LỊCH TRÌNH
+                </button>
+                <button onclick="openCandidateModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-2xl transition-all shadow-lg shadow-indigo-100 flex items-center">
+                    <i class="fas fa-user-plus mr-2 text-lg"></i> THÊM ỨNG VIÊN
+                </button>
+            </div>
+        </div>
+
+        <!-- Color Legend (Chú thích màu sắc) -->
+        <div class="flex flex-wrap items-center gap-4 mb-8 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2">Chú thích trạng thái:</span>
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-gray-400"></span>
+                <span class="text-xs font-semibold text-gray-600">Chưa phỏng vấn</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                <span class="text-xs font-semibold text-gray-600">Đã phỏng vấn</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                <span class="text-xs font-semibold text-gray-600">Phù hợp</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                <span class="text-xs font-semibold text-gray-600">Đang xem xét</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                <span class="text-xs font-semibold text-gray-600">Không phù hợp</span>
+            </div>
+        </div>
+
+        <!-- Table View -->
+        <div class="bg-white rounded-3xl shadow-sm overflow-hidden border border-gray-100">
+            <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-800">Danh sách ứng viên</h2>
+                <button onclick="fetchCandidates()" class="text-gray-400 hover:text-indigo-600 transition-colors"><i class="fas fa-sync-alt"></i></button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50/50">
+                            <th class="px-8 py-4 text-xs font-bold text-gray-400 uppercase">Ứng viên</th>
+                            <th class="px-8 py-4 text-xs font-bold text-gray-400 uppercase text-center">Ngày PV</th>
+                            <th class="px-8 py-4 text-xs font-bold text-gray-400 uppercase text-center">Trạng thái</th>
+                            <th class="px-8 py-4 text-xs font-bold text-gray-400 uppercase text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="candidateTableBody" class="divide-y divide-gray-50">
+                        <tr><td colspan="4" class="py-20 text-center">
+                            <div class="flex flex-col items-center">
+                                <span class="loader mb-2"></span>
+                                <p class="text-gray-400 italic">Đang tải dữ liệu...</p>
+                            </div>
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Thêm Ứng Viên -->
+    <div id="candidateModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-base">
+        <div onclick="closeModal('candidateModal')" class="absolute inset-0 bg-gray-900/40 backdrop-blur-md"></div>
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md relative z-10 modal-box overflow-hidden">
+            <div class="p-8 border-b border-gray-50 flex justify-between items-center">
+                <h3 class="text-2xl font-bold text-gray-900">Ứng viên mới</h3>
+                <button onclick="closeModal('candidateModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="candidateForm" class="p-8 space-y-4">
+                <input type="text" name="ho_ten" required placeholder="Họ và Tên" class="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none focus:border-indigo-500 font-medium bg-gray-50/50">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="email" name="email" required placeholder="Email" class="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none focus:border-indigo-500 font-medium bg-gray-50/50">
+                    <input type="tel" name="sdt" required placeholder="SĐT" class="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none focus:border-indigo-500 font-medium bg-gray-50/50">
+                </div>
+                <input type="date" id="dateInput" name="ngay_phong_van" required class="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none focus:border-indigo-500 font-medium bg-gray-50/50">
+                <textarea name="ghi_chu" placeholder="Ghi chú ban đầu..." rows="3" class="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none focus:border-indigo-500 font-medium bg-gray-50/50"></textarea>
+                <div class="pt-4 flex gap-4">
+                    <button type="submit" id="btnSubmit" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg">LƯU THÔNG TIN</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Lịch Hẹn -->
+    <div id="calendarModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-base">
+        <div onclick="closeModal('calendarModal')" class="absolute inset-0 bg-gray-900/60 backdrop-blur-md"></div>
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-5xl h-[90vh] relative z-10 modal-box overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-gray-50 flex justify-between items-center">
+                <h3 class="text-2xl font-bold">Lịch Phỏng vấn</h3>
+                <button onclick="closeModal('calendarModal')" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6" id="calendar"></div>
+        </div>
+    </div>
+
+    <!-- Modal: Chi Tiết Ứng Viên -->
+    <div id="detailModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 modal-base">
+        <div onclick="closeModal('detailModal')" class="absolute inset-0 bg-indigo-900/40 backdrop-blur-lg"></div>
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 modal-box overflow-hidden">
+            <div id="detailContent" class="p-8 space-y-6">
+                <!-- Nội dung được đổ bằng JS -->
+                <div class="flex justify-center py-10"><span class="loader"></span></div>
+            </div>
+            <div class="p-8 bg-gray-50 flex gap-4">
+                <button onclick="closeModal('detailModal')" class="flex-1 py-4 font-bold text-gray-400 hover:text-gray-600 transition-colors">ĐÓNG</button>
+                <button onclick="updateCandidate()" id="btnUpdate" class="flex-[2] bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-indigo-700 transition-all">CẬP NHẬT THÔNG TIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-12 left-1/2 transform -translate-x-1/2 translate-y-32 opacity-0 transition-all duration-500 bg-gray-900 text-white px-8 py-4 rounded-[2rem] z-[100] flex items-center">
+        <i class="fas fa-check-circle mr-3 text-green-400" id="toastIcon"></i>
+        <span id="toastMsg" class="font-bold text-sm">Thông báo</span>
+    </div>
+
+    <script>
+        const SHEETDB_API_URL = 'https://sheetdb.io/api/v1/54rgcr47hqclf';
+        let currentCandidates = [];
+        let selectedCandidate = null;
+        let calendar = null;
+
+        // Hàm hỗ trợ lấy màu dựa theo trạng thái
+        function getStatusColor(status) {
+            switch(status) {
+                case 'Phù hợp': return '#10b981'; // Green-500
+                case 'Không phù hợp': return '#f43f5e'; // Rose-500
+                case 'Đang xem xét': return '#f59e0b'; // Amber-500
+                case 'Đã phỏng vấn': return '#3b82f6'; // Blue-500
+                default: return '#9ca3af'; // Gray-400 (Chưa phỏng vấn)
+            }
+        }
+
+        // Quản lý Modal
+        function openCandidateModal() {
+            document.getElementById('candidateModal').classList.add('visible-custom');
+            document.getElementById('dateInput').valueAsDate = new Date();
+        }
+
+        function openCalendarModal() {
+            document.getElementById('calendarModal').classList.add('visible-custom');
+            setTimeout(() => {
+                if (!calendar) {
+                    calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+                        initialView: 'dayGridMonth',
+                        locale: 'vi',
+                        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
+                        events: generateEvents(),
+                        eventClick: (info) => openDetailModal(info.event.extendedProps.email)
+                    });
+                } else {
+                    calendar.removeAllEvents();
+                    calendar.addEventSource(generateEvents());
+                }
+                calendar.render();
+            }, 100);
+        }
+
+        function openDetailModal(email) {
+            selectedCandidate = currentCandidates.find(c => c.email === email);
+            if (!selectedCandidate) return;
+
+            document.getElementById('detailModal').classList.add('visible-custom');
+            const content = document.getElementById('detailContent');
+            
+            content.innerHTML = `
+                <div class="flex items-center gap-5">
+                    <div class="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold" style="background-color: ${getStatusColor(selectedCandidate.trang_thai)}">
+                        ${selectedCandidate.ho_ten.charAt(0)}
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black text-gray-900">${selectedCandidate.ho_ten}</h2>
+                        <p class="text-indigo-500 font-semibold flex items-center">
+                            <i class="far fa-calendar-check mr-2"></i> ${selectedCandidate.ngay_phong_van}
+                        </p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-sm font-medium">
+                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                        <p class="text-gray-400 text-[10px] uppercase font-bold mb-1">Email</p>
+                        <p class="truncate font-bold">${selectedCandidate.email}</p>
+                    </div>
+                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                        <p class="text-gray-400 text-[10px] uppercase font-bold mb-1">Số điện thoại</p>
+                        <p class="font-bold">${selectedCandidate.sdt}</p>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Trạng thái hiện tại</label>
+                    <select id="updateStatus" class="w-full px-5 py-3 border border-gray-200 rounded-2xl font-bold text-gray-700 bg-white outline-none focus:ring-4 focus:ring-indigo-500/10">
+                        <option value="Chưa phỏng vấn" ${selectedCandidate.trang_thai === 'Chưa phỏng vấn' ? 'selected' : ''}>Chưa phỏng vấn</option>
+                        <option value="Đã phỏng vấn" ${selectedCandidate.trang_thai === 'Đã phỏng vấn' ? 'selected' : ''}>Đã phỏng vấn</option>
+                        <option value="Phù hợp" ${selectedCandidate.trang_thai === 'Phù hợp' ? 'selected' : ''}>Phù hợp</option>
+                        <option value="Không phù hợp" ${selectedCandidate.trang_thai === 'Không phù hợp' ? 'selected' : ''}>Không phù hợp</option>
+                        <option value="Đang xem xét" ${selectedCandidate.trang_thai === 'Đang xem xét' ? 'selected' : ''}>Đang xem xét</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Ghi chú & Nhận xét</label>
+                    <textarea id="updateNote" rows="4" class="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/10 bg-gray-50/30" placeholder="Nhập nhận xét chi tiết sau phỏng vấn...">${selectedCandidate.ghi_chu || ''}</textarea>
+                </div>
+            `;
+        }
+
+        async function updateCandidate() {
+            if (!selectedCandidate) return;
+            const btn = document.getElementById('btnUpdate');
+            const newStatus = document.getElementById('updateStatus').value;
+            const newNote = document.getElementById('updateNote').value;
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="loader border-white/30 border-t-white w-4 h-4 mr-2"></span> ĐANG CẬP NHẬT...`;
+
+            try {
+                const response = await fetch(`${SHEETDB_API_URL}/email/${encodeURIComponent(selectedCandidate.email)}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        data: {
+                            trang_thai: newStatus,
+                            ghi_chu: newNote
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    showToast('Cập nhật trạng thái thành công!');
+                    closeModal('detailModal');
+                    fetchCandidates();
+                } else {
+                    throw new Error('Update Failed');
+                }
+            } catch (error) {
+                showToast('Lỗi: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'CẬP NHẬT THÔNG TIN';
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('visible-custom');
+        }
+
+        function generateEvents() {
+            return currentCandidates.map(c => ({
+                title: c.ho_ten, 
+                start: c.ngay_phong_van, 
+                backgroundColor: getStatusColor(c.trang_thai), 
+                extendedProps: { email: c.email } 
+            }));
+        }
+
+        async function fetchCandidates() {
+            const body = document.getElementById('candidateTableBody');
+            try {
+                const response = await fetch(SHEETDB_API_URL);
+                currentCandidates = await response.json();
+                renderTable(currentCandidates);
+                if (calendar) {
+                    calendar.removeAllEvents();
+                    calendar.addEventSource(generateEvents());
+                }
+            } catch (error) {
+                body.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-red-500">Lỗi kết nối API.</td></tr>`;
+            }
+        }
+
+        function renderTable(list) {
+            const body = document.getElementById('candidateTableBody');
+            if (!list.length) {
+                body.innerHTML = `<tr><td colspan="4" class="text-center py-20 text-gray-400">Danh sách ứng viên đang trống.</td></tr>`;
+                return;
+            }
+            body.innerHTML = [...list].reverse().map(c => {
+                let statusStyle = 'bg-gray-100 text-gray-500 border-gray-100';
+                if (c.trang_thai === 'Phù hợp') statusStyle = 'bg-green-50 text-green-600 border-green-100';
+                else if (c.trang_thai === 'Không phù hợp') statusStyle = 'bg-red-50 text-red-600 border-red-100';
+                else if (c.trang_thai === 'Đã phỏng vấn') statusStyle = 'bg-blue-50 text-blue-600 border-blue-100';
+                else if (c.trang_thai === 'Đang xem xét') statusStyle = 'bg-yellow-50 text-yellow-600 border-yellow-100';
+
+                return `
+                    <tr class="hover:bg-gray-50/50 transition cursor-pointer" onclick="openDetailModal('${c.email}')">
+                        <td class="px-8 py-5">
+                            <div class="font-bold text-gray-900">${c.ho_ten}</div>
+                            <div class="text-xs text-gray-400 font-medium">${c.email}</div>
+                        </td>
+                        <td class="px-8 py-5 text-center font-bold text-gray-500 text-sm italic">${c.ngay_phong_van}</td>
+                        <td class="px-8 py-5 text-center">
+                            <span class="px-3 py-1.5 rounded-full text-[10px] font-black border uppercase tracking-widest ${statusStyle}">
+                                ${c.trang_thai}
+                            </span>
+                        </td>
+                        <td class="px-8 py-5 text-right">
+                            <button class="w-8 h-8 rounded-full hover:bg-indigo-50 text-indigo-300 hover:text-indigo-600 transition-colors">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('candidateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true;
+            btn.innerText = 'ĐANG XỬ LÝ...';
+
+            const payload = { data: [Object.fromEntries(new FormData(e.target).entries())] };
+            payload.data[0].trang_thai = "Chưa phỏng vấn";
+
+            try {
+                const res = await fetch(SHEETDB_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    showToast('Đã thêm ứng viên mới!');
+                    closeModal('candidateModal');
+                    fetchCandidates();
+                    e.target.reset();
+                }
+            } catch (err) {
+                showToast('Lỗi lưu dữ liệu', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'LƯU THÔNG TIN';
+            }
+        });
+
+        function showToast(m, type = 'success') {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = m;
+            document.getElementById('toastIcon').className = type === 'error' ? 'fas fa-exclamation-circle mr-3 text-red-400' : 'fas fa-check-circle mr-3 text-green-400';
+            t.classList.remove('translate-y-32', 'opacity-0');
+            setTimeout(() => t.classList.add('translate-y-32', 'opacity-0'), 3000);
+        }
+
+        window.onload = fetchCandidates;
+    </script>
+</body>
+</html>
