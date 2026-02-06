@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Interview Manager</title>
+    <title>HR Pro + Telegram Bot</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
@@ -23,14 +23,10 @@
 
         .modal-base {
             transition: all 0.3s ease;
-            visibility: hidden;
-            opacity: 0;
-            pointer-events: none;
+            visibility: hidden; opacity: 0; pointer-events: none;
         }
         .modal-base.visible-custom {
-            visibility: visible;
-            opacity: 1;
-            pointer-events: auto;
+            visibility: visible; opacity: 1; pointer-events: auto;
         }
         .modal-box {
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -62,43 +58,50 @@
             <div>
                 <div class="flex items-center gap-3 mb-2">
                     <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
-                        <i class="fas fa-users-rectangle text-xl"></i>
+                        <i class="fas fa-paper-plane text-xl"></i>
                     </div>
-                    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Tuyển dụng <span class="text-indigo-600">Pro</span></h1>
+                    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">HR <span class="text-indigo-600">Telegram Pro</span></h1>
                 </div>
-                <p class="text-slate-500 font-medium">Quản lý ứng viên & Nhận xét phỏng vấn</p>
+                <p class="text-slate-500 font-medium">Quản lý ứng viên & Thông báo qua @TroLyChiChauHR_bot</p>
             </div>
             <div class="flex gap-3">
+                <button onclick="openConfigModal()" class="bg-white hover:bg-slate-50 text-slate-600 font-bold py-3.5 px-5 rounded-2xl transition-all shadow-sm border border-slate-200 flex items-center group">
+                    <i class="fas fa-cog mr-2 text-indigo-500"></i> Cấu hình Bot
+                </button>
                 <button onclick="openCalendarModal()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold py-3.5 px-6 rounded-2xl transition-all shadow-sm border border-slate-200 flex items-center group">
-                    <i class="fas fa-calendar-day mr-2 text-indigo-500 group-hover:scale-110 transition-transform"></i> Xem lịch
+                    <i class="fas fa-calendar-day mr-2 text-indigo-500"></i> Xem lịch
                 </button>
                 <button onclick="openCandidateModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-8 rounded-2xl transition-all shadow-xl shadow-indigo-100 flex items-center group">
-                    <i class="fas fa-plus mr-2 group-hover:rotate-90 transition-transform"></i> Thêm mới
+                    <i class="fas fa-plus mr-2"></i> Thêm mới
                 </button>
             </div>
         </div>
 
         <!-- Dashboard Stats -->
-        <div id="stats" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
+        <div id="stats" class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-10">
             <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
-                <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Tổng hồ sơ</p>
-                <p id="statTotal" class="text-2xl font-black text-slate-800">0</p>
+                <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Tổng hồ sơ</p>
+                <p id="statTotal" class="text-xl font-black text-slate-800">0</p>
             </div>
             <div class="bg-indigo-50/50 p-5 rounded-3xl border border-indigo-100/50 shadow-sm">
-                <p class="text-[10px] font-extrabold text-indigo-400 uppercase tracking-widest mb-1">Đã PV</p>
-                <p id="statInterviewed" class="text-2xl font-black text-indigo-600">0</p>
+                <p class="text-[9px] font-extrabold text-indigo-400 uppercase tracking-widest mb-1">Đã PV</p>
+                <p id="statInterviewed" class="text-xl font-black text-indigo-600">0</p>
             </div>
             <div class="bg-emerald-50/50 p-5 rounded-3xl border border-emerald-100/50 shadow-sm">
-                <p class="text-[10px] font-extrabold text-emerald-400 uppercase tracking-widest mb-1">Phù hợp</p>
-                <p id="statQualified" class="text-2xl font-black text-emerald-600">0</p>
+                <p class="text-[9px] font-extrabold text-emerald-400 uppercase tracking-widest mb-1">Phù hợp</p>
+                <p id="statQualified" class="text-xl font-black text-emerald-600">0</p>
             </div>
             <div class="bg-amber-50/50 p-5 rounded-3xl border border-amber-100/50 shadow-sm">
-                <p class="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest mb-1">Đang xét</p>
-                <p id="statPending" class="text-2xl font-black text-amber-600">0</p>
+                <p class="text-[9px] font-extrabold text-amber-400 uppercase tracking-widest mb-1">Đang xét</p>
+                <p id="statPending" class="text-xl font-black text-amber-600">0</p>
             </div>
             <div class="bg-rose-50/50 p-5 rounded-3xl border border-rose-100/50 shadow-sm">
-                <p class="text-[10px] font-extrabold text-rose-400 uppercase tracking-widest mb-1">Loại</p>
-                <p id="statRejected" class="text-2xl font-black text-rose-600">0</p>
+                <p class="text-[9px] font-extrabold text-rose-400 uppercase tracking-widest mb-1">Loại</p>
+                <p id="statRejected" class="text-xl font-black text-rose-600">0</p>
+            </div>
+            <div class="bg-slate-900 p-5 rounded-3xl shadow-sm">
+                <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Chat ID</p>
+                <p id="statChatId" class="text-[10px] font-black text-white truncate">Chưa cài đặt</p>
             </div>
         </div>
 
@@ -127,12 +130,11 @@
                             <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest">Họ tên & Vị trí</th>
                             <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Ngày PV</th>
                             <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Trạng thái</th>
+                            <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Báo Bot</th>
                             <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right">Chi tiết</th>
                         </tr>
                     </thead>
-                    <tbody id="candidateTableBody" class="divide-y divide-slate-100">
-                        <!-- Content here -->
-                    </tbody>
+                    <tbody id="candidateTableBody" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
         </div>
@@ -156,23 +158,31 @@
                     <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">SĐT</label><input type="tel" name="sdt" required placeholder="090..." class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></div>
                 </div>
                 <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Ngày phỏng vấn</label><input type="date" id="dateInput" name="ngay_phong_van" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-bold text-slate-600"></div>
-                <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Ghi chú/Nhận xét ban đầu</label><textarea name="ghi_chu" rows="3" placeholder="Ghi chú về ứng viên..." class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></textarea></div>
+                <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Nhận xét ban đầu</label><textarea name="ghi_chu" rows="2" placeholder="Ghi chú về ứng viên..." class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></textarea></div>
+                
+                <div class="flex items-center gap-2 px-2">
+                    <input type="checkbox" id="sendTgNew" checked class="w-4 h-4 accent-indigo-600 rounded">
+                    <label for="sendTgNew" class="text-xs font-bold text-slate-500">Báo qua @TroLyChiChauHR_bot ngay</label>
+                </div>
+
                 <button type="submit" id="btnSubmit" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 transition-all uppercase tracking-wider">Lưu hồ sơ</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: DETAIL & UPDATE & DELETE -->
+    <!-- MODAL: DETAIL & UPDATE -->
     <div id="detailModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 modal-base">
         <div onclick="closeModal('detailModal')" class="absolute inset-0 bg-slate-900/60 backdrop-blur-md"></div>
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 modal-box overflow-hidden">
-            <div id="detailContent" class="p-10 space-y-6">
-                <!-- Content loaded dynamically -->
+            <div id="detailContent" class="p-10 space-y-6"></div>
+            <div class="px-10 pb-6 flex items-center gap-2">
+                <input type="checkbox" id="sendTgUpdate" checked class="w-4 h-4 accent-indigo-600 rounded">
+                <label for="sendTgUpdate" class="text-xs font-bold text-slate-400">Gửi thông báo cập nhật qua Telegram</label>
             </div>
             <div class="p-8 bg-slate-50 border-t border-slate-100 flex gap-4">
-                <button onclick="confirmDelete()" id="btnDelete" class="w-12 h-12 flex items-center justify-center bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white rounded-2xl transition-all shadow-sm border border-rose-100"><i class="fas fa-trash-alt"></i></button>
+                <button onclick="confirmDelete()" id="btnDelete" class="w-12 h-12 flex items-center justify-center bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white rounded-2xl transition-all border border-rose-100"><i class="fas fa-trash-alt"></i></button>
                 <button onclick="closeModal('detailModal')" class="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600 text-sm">ĐÓNG</button>
-                <button onclick="updateCandidate()" id="btnUpdate" class="flex-[3] bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 text-sm tracking-wide">CẬP NHẬT NHẬN XÉT</button>
+                <button onclick="updateCandidate()" id="btnUpdate" class="flex-[3] bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 text-sm tracking-wide uppercase">Cập nhật & Báo Bot</button>
             </div>
         </div>
     </div>
@@ -186,18 +196,37 @@
         </div>
     </div>
 
+    <!-- CONFIG TELEGRAM MODAL -->
+    <div id="configModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-base">
+        <div onclick="closeModal('configModal')" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md relative z-10 modal-box p-10">
+            <h3 class="text-2xl font-black text-slate-900 mb-2">Cấu hình Bot</h3>
+            <p class="text-xs text-slate-500 mb-6">Nhập Chat ID từ <b>@userinfobot</b> để nhận thông báo.</p>
+            <div class="space-y-4">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black text-slate-400 uppercase ml-2">Chat ID</label>
+                    <input type="text" id="tgChatId" placeholder="VD: 123456789" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-mono text-sm">
+                </div>
+                <button onclick="saveConfig()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-black transition-all uppercase tracking-wider">Lưu Chat ID</button>
+            </div>
+        </div>
+    </div>
+
     <!-- TOAST -->
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 translate-y-32 opacity-0 transition-all duration-500 bg-slate-900 text-white px-8 py-4 rounded-full z-[100] flex items-center shadow-2xl">
         <div id="toastIconBox" class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center mr-3"><i class="fas fa-check text-[10px]" id="toastIcon"></i></div>
-        <span id="toastMsg" class="font-bold text-sm">Hành động thành công</span>
+        <span id="toastMsg" class="font-bold text-sm">Thành công</span>
     </div>
 
     <script>
         const SHEETDB_URL = 'https://sheetdb.io/api/v1/54rgcr47hqclf';
+        const BOT_TOKEN = '8572972435:AAHKhFG2rSLKbIGwuGHfcYoUbNlJ81h5r7c';
+        
         let allData = [];
         let displayData = [];
         let currentEmail = null;
         let fcCalendar = null;
+        let config = { token: BOT_TOKEN, chatId: localStorage.getItem('tgChatId') || '' };
 
         const getStatusTheme = (s) => {
             switch(s) {
@@ -211,13 +240,13 @@
 
         async function fetchCandidates() {
             const body = document.getElementById('candidateTableBody');
-            body.innerHTML = `<tr><td colspan="4" class="py-24 text-center"><div class="flex flex-col items-center"><div class="loader mb-4"></div><p class="text-slate-400 italic">Đang đồng bộ từ Google Sheets...</p></div></td></tr>`;
+            body.innerHTML = `<tr><td colspan="5" class="py-24 text-center"><div class="flex flex-col items-center"><div class="loader mb-4"></div><p class="text-slate-400 italic font-medium">Đang đồng bộ dữ liệu...</p></div></td></tr>`;
             try {
                 const res = await fetch(SHEETDB_URL);
                 allData = await res.json();
                 filterData();
             } catch (err) {
-                body.innerHTML = `<tr><td colspan="4" class="py-10 text-center text-rose-500 font-bold">Lỗi kết nối! Vui lòng kiểm tra lại API SheetDB.</td></tr>`;
+                showToast("Lỗi kết nối API!", "error");
             }
         }
 
@@ -233,23 +262,26 @@
         function renderUI() {
             const body = document.getElementById('candidateTableBody');
             if (displayData.length === 0) {
-                body.innerHTML = `<tr><td colspan="4" class="py-20 text-center text-slate-400 font-medium italic">Không có ứng viên nào</td></tr>`;
+                body.innerHTML = `<tr><td colspan="5" class="py-20 text-center text-slate-400 italic">Không tìm thấy ứng viên</td></tr>`;
                 updateDashboard(0,0,0,0,0);
                 return;
             }
             body.innerHTML = displayData.sort((a,b) => new Date(b.ngay_phong_van) - new Date(a.ngay_phong_van)).map(c => {
                 const theme = getStatusTheme(c.trang_thai);
-                return `<tr class="hover:bg-slate-50/50 transition cursor-pointer group" onclick="openDetailModal('${c.email}')">
-                    <td class="px-8 py-5">
+                return `<tr class="hover:bg-slate-50 transition cursor-pointer group">
+                    <td class="px-8 py-5" onclick="openDetailModal('${c.email}')">
                         <div class="font-bold text-slate-900">${c.ho_ten}</div>
                         <div class="flex items-center gap-2 mt-1">
-                            <span class="bg-indigo-600 text-white text-[9px] px-2 py-0.5 rounded-md font-black uppercase tracking-widest">${c.vi_tri || 'N/A'}</span>
+                            <span class="bg-indigo-600 text-white text-[9px] px-2 py-0.5 rounded-md font-black uppercase">${c.vi_tri || 'N/A'}</span>
                             <span class="text-xs text-slate-400 font-medium">${c.email}</span>
                         </div>
                     </td>
-                    <td class="px-8 py-5 text-center"><span class="text-sm font-bold text-slate-500 tabular-nums">${c.ngay_phong_van}</span></td>
-                    <td class="px-8 py-5 text-center"><span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-wider ${theme.bg} ${theme.text} ${theme.border}"><span class="w-1.5 h-1.5 rounded-full ${theme.dot}"></span>${c.trang_thai || 'Mới'}</span></td>
-                    <td class="px-8 py-5 text-right"><button class="w-10 h-10 rounded-xl bg-slate-50 text-slate-300 group-hover:bg-indigo-600 group-hover:text-white transition-all flex items-center justify-center ml-auto"><i class="fas fa-chevron-right text-xs"></i></button></td>
+                    <td class="px-8 py-5 text-center font-bold text-slate-500 text-sm" onclick="openDetailModal('${c.email}')">${c.ngay_phong_van}</td>
+                    <td class="px-8 py-5 text-center" onclick="openDetailModal('${c.email}')"><span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-wider ${theme.bg} ${theme.text} ${theme.border}"><span class="w-1.5 h-1.5 rounded-full ${theme.dot}"></span>${c.trang_thai || 'Mới'}</span></td>
+                    <td class="px-8 py-5 text-center">
+                        <button onclick="sendToTelegramManual('${c.email}')" class="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:bg-indigo-600 hover:text-white transition-all flex items-center justify-center mx-auto"><i class="fab fa-telegram-plane"></i></button>
+                    </td>
+                    <td class="px-8 py-5 text-right"><button onclick="openDetailModal('${c.email}')" class="w-10 h-10 rounded-xl bg-slate-50 text-slate-300 group-hover:bg-indigo-600 group-hover:text-white transition-all flex items-center justify-center ml-auto"><i class="fas fa-chevron-right text-xs"></i></button></td>
                 </tr>`;
             }).join('');
 
@@ -270,19 +302,33 @@
             document.getElementById('statQualified').innerText = q;
             document.getElementById('statPending').innerText = p;
             document.getElementById('statRejected').innerText = r;
+            document.getElementById('statChatId').innerText = config.chatId || "Chưa thiết lập";
         }
 
-        function openCandidateModal() {
-            document.getElementById('candidateModal').classList.add('visible-custom');
-            document.getElementById('dateInput').valueAsDate = new Date();
+        async function sendTelegram(message) {
+            if (!config.chatId) { showToast("Vui lòng cài Chat ID trước!", "error"); return false; }
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${config.token}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: config.chatId, text: message, parse_mode: 'HTML' })
+                });
+                return response.ok;
+            } catch (e) { return false; }
         }
 
-        function closeModal(id) { document.getElementById(id).classList.remove('visible-custom'); }
+        async function sendToTelegramManual(email) {
+            const c = allData.find(x => x.email === email);
+            if (!c) return;
+            const msg = `🔔 <b>THÔNG TIN ỨNG VIÊN</b>\n\n👤 <b>Tên:</b> ${c.ho_ten}\n💼 <b>Vị trí:</b> ${c.vi_tri}\n📅 <b>Ngày PV:</b> ${c.ngay_phong_van}\n📌 <b>Trạng thái:</b> ${c.trang_thai}\n📝 <b>Ghi chú:</b> ${c.ghi_chu || 'Không có'}`;
+            const ok = await sendTelegram(msg);
+            if (ok) showToast("Đã gửi báo cáo Telegram!");
+        }
 
         document.getElementById('candidateForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSubmit');
-            btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Đang gửi...`;
+            btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Đang lưu...`;
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData.entries());
             data.trang_thai = "Chưa phỏng vấn";
@@ -293,15 +339,18 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ data: [data] })
                 });
-                showToast('Đã thêm hồ sơ ứng viên thành công!');
+
+                if (document.getElementById('sendTgNew').checked) {
+                    const msg = `🚀 <b>ỨNG VIÊN MỚI</b>\n\n👤 <b>Tên:</b> ${data.ho_ten}\n🎯 <b>Vị trí:</b> ${data.vi_tri}\n📅 <b>Lịch PV:</b> ${data.ngay_phong_van}`;
+                    await sendTelegram(msg);
+                }
+
+                showToast('Thêm hồ sơ thành công!');
                 closeModal('candidateModal');
                 e.target.reset();
                 fetchCandidates();
-            } catch (err) {
-                showToast('Lỗi gửi dữ liệu!', 'error');
-            } finally {
-                btn.disabled = false; btn.innerText = 'Lưu hồ sơ';
-            }
+            } catch (err) { showToast('Lỗi gửi dữ liệu!', 'error'); } 
+            finally { btn.disabled = false; btn.innerText = 'Lưu hồ sơ'; }
         });
 
         function openDetailModal(email) {
@@ -318,20 +367,17 @@
                         <span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest mt-1 inline-block">${c.vi_tri || 'N/A'}</span>
                     </div>
                 </div>
-                
                 <div class="grid grid-cols-2 gap-3">
                     <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100"><p class="text-[9px] font-black text-slate-400 uppercase mb-1">Email</p><p class="font-bold text-slate-700 text-xs truncate">${c.email}</p></div>
                     <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100"><p class="text-[9px] font-black text-slate-400 uppercase mb-1">SĐT</p><p class="font-bold text-slate-700 text-xs">${c.sdt}</p></div>
                 </div>
-
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Ngày PV</label><input type="date" id="upDate" value="${c.ngay_phong_van}" class="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 outline-none"></div>
                     <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Trạng thái</label><select id="upStatus" class="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl font-bold text-slate-700 outline-none"><option value="Chưa phỏng vấn" ${c.trang_thai === 'Chưa phỏng vấn' ? 'selected' : ''}>Chưa PV</option><option value="Đã phỏng vấn" ${c.trang_thai === 'Đã phỏng vấn' ? 'selected' : ''}>Đã PV</option><option value="Phù hợp" ${c.trang_thai === 'Phù hợp' ? 'selected' : ''}>Phù hợp</option><option value="Không phù hợp" ${c.trang_thai === 'Không phù hợp' ? 'selected' : ''}>Loại</option><option value="Đang xem xét" ${c.trang_thai === 'Đang xem xét' ? 'selected' : ''}>Đang xét</option></select></div>
                 </div>
-
                 <div class="space-y-1">
-                    <label class="text-[10px] font-black text-slate-400 uppercase ml-2">Nhận xét & Ghi chú (Cột cuối sheet)</label>
-                    <textarea id="upNote" rows="4" class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-3xl font-medium text-slate-600 outline-none" placeholder="Nhập nhận xét sau phỏng vấn tại đây...">${c.ghi_chu || ''}</textarea>
+                    <label class="text-[10px] font-black text-slate-400 uppercase ml-2">Nhận xét chi tiết</label>
+                    <textarea id="upNote" rows="4" class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-3xl font-medium text-slate-600 outline-none" placeholder="Ghi chú sau phỏng vấn...">${c.ghi_chu || ''}</textarea>
                 </div>
             `;
         }
@@ -351,30 +397,27 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ data })
                 });
-                showToast('Cập nhật nhận xét thành công!');
+
+                if (document.getElementById('sendTgUpdate').checked) {
+                    const msg = `📝 <b>CẬP NHẬT PHỎNG VẤN</b>\n\n👤 <b>Tên:</b> ${currentEmail}\n📌 <b>Trạng thái mới:</b> ${data.trang_thai}\n📝 <b>Ghi chú:</b> ${data.ghi_chu}`;
+                    await sendTelegram(msg);
+                }
+
+                showToast('Đã cập nhật!');
                 closeModal('detailModal');
                 fetchCandidates();
-            } catch (e) {
-                showToast('Lỗi cập nhật!', 'error');
-            } finally {
-                btn.disabled = false; btn.innerText = 'CẬP NHẬT NHẬN XÉT';
-            }
+            } catch (e) { showToast('Lỗi cập nhật!', 'error'); } 
+            finally { btn.disabled = false; btn.innerText = 'CẬP NHẬT & BÁO BOT'; }
         }
 
         async function confirmDelete() {
-            if (!currentEmail || !confirm(`Xác nhận xóa hồ sơ: ${currentEmail}?`)) return;
-            const btn = document.getElementById('btnDelete');
-            btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+            if (!currentEmail || !confirm(`Xóa hồ sơ: ${currentEmail}?`)) return;
             try {
                 await fetch(`${SHEETDB_URL}/email/${encodeURIComponent(currentEmail)}`, { method: 'DELETE' });
-                showToast('Đã xóa hồ sơ khỏi danh sách!');
+                showToast('Đã xóa hồ sơ!');
                 closeModal('detailModal');
                 fetchCandidates();
-            } catch (e) {
-                showToast('Lỗi khi xóa!', 'error');
-            } finally {
-                btn.disabled = false; btn.innerHTML = `<i class="fas fa-trash-alt"></i>`;
-            }
+            } catch (e) { showToast('Lỗi!', 'error'); }
         }
 
         function openCalendarModal() {
@@ -397,20 +440,39 @@
             fcCalendar.addEventSource(displayData.map(c => ({ title: c.ho_ten, start: c.ngay_phong_van, backgroundColor: getStatusTheme(c.trang_thai).hex, extendedProps: { email: c.email } })));
         }
 
+        function openConfigModal() {
+            document.getElementById('tgChatId').value = config.chatId;
+            document.getElementById('configModal').classList.add('visible-custom');
+        }
+
+        function saveConfig() {
+            const val = document.getElementById('tgChatId').value;
+            if(!val) return showToast("Nhập ID của bạn!", "error");
+            localStorage.setItem('tgChatId', val);
+            config.chatId = val;
+            showToast("Đã lưu cấu hình Bot!");
+            closeModal('configModal');
+            renderUI();
+        }
+
+        function openCandidateModal() {
+            document.getElementById('candidateModal').classList.add('visible-custom');
+            document.getElementById('dateInput').valueAsDate = new Date();
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.remove('visible-custom'); }
+
         function showToast(msg, type = 'success') {
             const t = document.getElementById('toast');
             document.getElementById('toastMsg').innerText = msg;
             const box = document.getElementById('toastIconBox');
-            if (type === 'error') { box.classList.replace('bg-emerald-500', 'bg-rose-500'); document.getElementById('toastIcon').className = 'fas fa-exclamation text-[10px]'; } 
-            else { box.classList.replace('bg-rose-500', 'bg-emerald-500'); document.getElementById('toastIcon').className = 'fas fa-check text-[10px]'; }
+            if (type === 'error') { box.className = 'w-6 h-6 rounded-full bg-rose-500 flex items-center justify-center mr-3'; document.getElementById('toastIcon').className = 'fas fa-exclamation text-[10px]'; } 
+            else { box.className = 'w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center mr-3'; document.getElementById('toastIcon').className = 'fas fa-check text-[10px]'; }
             t.classList.remove('translate-y-32', 'opacity-0');
             setTimeout(() => t.classList.add('translate-y-32', 'opacity-0'), 3000);
         }
 
-        function resetFilters() {
-            document.getElementById('filterPosition').value = '';
-            filterData();
-        }
+        function resetFilters() { document.getElementById('filterPosition').value = ''; filterData(); }
 
         window.onload = fetchCandidates;
     </script>
