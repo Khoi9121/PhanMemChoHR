@@ -62,7 +62,7 @@
                     </div>
                     <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">HR <span class="text-indigo-600">Telegram Pro</span></h1>
                 </div>
-                <p class="text-slate-500 font-medium">Quản lý ứng viên & Thông báo qua @TroLyChiChauHR_bot</p>
+                <p class="text-slate-500 font-medium">Hệ thống đồng bộ dữ liệu tự động (PhanMemChoHR & Bot Auto)</p>
             </div>
             <div class="flex gap-3">
                 <button onclick="openConfigModal()" class="bg-white hover:bg-slate-50 text-slate-600 font-bold py-3.5 px-5 rounded-2xl transition-all shadow-sm border border-slate-200 flex items-center group">
@@ -162,10 +162,10 @@
                 
                 <div class="flex items-center gap-2 px-2">
                     <input type="checkbox" id="sendTgNew" checked class="w-4 h-4 accent-indigo-600 rounded">
-                    <label for="sendTgNew" class="text-xs font-bold text-slate-500">Báo qua @TroLyChiChauHR_bot ngay</label>
+                    <label for="sendTgNew" class="text-xs font-bold text-slate-500">Gửi thông báo Telegram tức thì</label>
                 </div>
 
-                <button type="submit" id="btnSubmit" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 transition-all uppercase tracking-wider">Lưu hồ sơ</button>
+                <button type="submit" id="btnSubmit" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 transition-all uppercase tracking-wider">Lưu & Đồng bộ</button>
             </form>
         </div>
     </div>
@@ -177,12 +177,12 @@
             <div id="detailContent" class="p-10 space-y-6"></div>
             <div class="px-10 pb-6 flex items-center gap-2">
                 <input type="checkbox" id="sendTgUpdate" checked class="w-4 h-4 accent-indigo-600 rounded">
-                <label for="sendTgUpdate" class="text-xs font-bold text-slate-400">Gửi thông báo cập nhật qua Telegram</label>
+                <label for="sendTgUpdate" class="text-xs font-bold text-slate-400">Cập nhật thông tin qua Bot</label>
             </div>
             <div class="p-8 bg-slate-50 border-t border-slate-100 flex gap-4">
                 <button onclick="confirmDelete()" id="btnDelete" class="w-12 h-12 flex items-center justify-center bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white rounded-2xl transition-all border border-rose-100"><i class="fas fa-trash-alt"></i></button>
                 <button onclick="closeModal('detailModal')" class="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600 text-sm">ĐÓNG</button>
-                <button onclick="updateCandidate()" id="btnUpdate" class="flex-[3] bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 text-sm tracking-wide uppercase">Cập nhật & Báo Bot</button>
+                <button onclick="updateCandidate()" id="btnUpdate" class="flex-[3] bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 text-sm tracking-wide uppercase">Cập nhật hệ thống</button>
             </div>
         </div>
     </div>
@@ -219,7 +219,8 @@
     </div>
 
     <script>
-        const SHEETDB_URL = 'https://sheetdb.io/api/v1/54rgcr47hqclf';
+        const DB_HR = 'https://sheetdb.io/api/v1/54rgcr47hqclf';
+        const DB_AUTO = 'https://sheetdb.io/api/v1/cb64fw1uokl42';
         const BOT_TOKEN = '8572972435:AAHKhFG2rSLKbIGwuGHfcYoUbNlJ81h5r7c';
         
         let allData = [];
@@ -242,7 +243,7 @@
             const body = document.getElementById('candidateTableBody');
             body.innerHTML = `<tr><td colspan="5" class="py-24 text-center"><div class="flex flex-col items-center"><div class="loader mb-4"></div><p class="text-slate-400 italic font-medium">Đang đồng bộ dữ liệu...</p></div></td></tr>`;
             try {
-                const res = await fetch(SHEETDB_URL);
+                const res = await fetch(DB_HR);
                 allData = await res.json();
                 filterData();
             } catch (err) {
@@ -306,7 +307,7 @@
         }
 
         async function sendTelegram(message) {
-            if (!config.chatId) { showToast("Vui lòng cài Chat ID trước!", "error"); return false; }
+            if (!config.chatId) return false;
             try {
                 const response = await fetch(`https://api.telegram.org/bot${config.token}/sendMessage`, {
                     method: 'POST',
@@ -320,7 +321,7 @@
         async function sendToTelegramManual(email) {
             const c = allData.find(x => x.email === email);
             if (!c) return;
-            const msg = `🔔 <b>THÔNG TIN ỨNG VIÊN</b>\n\n👤 <b>Tên:</b> ${c.ho_ten}\n💼 <b>Vị trí:</b> ${c.vi_tri}\n📅 <b>Ngày PV:</b> ${c.ngay_phong_van}\n📌 <b>Trạng thái:</b> ${c.trang_thai}\n📝 <b>Ghi chú:</b> ${c.ghi_chu || 'Không có'}`;
+            const msg = `🔔 <b>GỬI THỦ CÔNG: THÔNG TIN ỨNG VIÊN</b>\n\n👤 <b>Tên:</b> ${c.ho_ten}\n💼 <b>Vị trí:</b> ${c.vi_tri}\n📅 <b>Ngày PV:</b> ${c.ngay_phong_van}\n📌 <b>Trạng thái:</b> ${c.trang_thai}\n📝 <b>Ghi chú:</b> ${c.ghi_chu || 'Không có'}`;
             const ok = await sendTelegram(msg);
             if (ok) showToast("Đã gửi báo cáo Telegram!");
         }
@@ -328,29 +329,48 @@
         document.getElementById('candidateForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSubmit');
-            btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Đang lưu...`;
+            btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Đang đồng bộ...`;
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData.entries());
             data.trang_thai = "Chưa phỏng vấn";
 
             try {
-                await fetch(SHEETDB_URL, {
+                // 1. Lưu vào Sheet chính
+                const p1 = fetch(DB_HR, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ data: [data] })
                 });
+
+                // 2. Lưu vào Sheet Auto (chỉ những thông tin cần thiết)
+                const autoData = {
+                    ho_ten: data.ho_ten,
+                    vi_tri: data.vi_tri,
+                    email: data.email,
+                    sdt: data.sdt,
+                    ngay_phong_van: data.ngay_phong_van,
+                    trang_thai: data.trang_thai,
+                    ghi_chu: data.ghi_chu
+                };
+                const p2 = fetch(DB_AUTO, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: [autoData] })
+                });
+
+                await Promise.all([p1, p2]);
 
                 if (document.getElementById('sendTgNew').checked) {
                     const msg = `🚀 <b>ỨNG VIÊN MỚI</b>\n\n👤 <b>Tên:</b> ${data.ho_ten}\n🎯 <b>Vị trí:</b> ${data.vi_tri}\n📅 <b>Lịch PV:</b> ${data.ngay_phong_van}`;
                     await sendTelegram(msg);
                 }
 
-                showToast('Thêm hồ sơ thành công!');
+                showToast('Thêm hồ sơ & Đồng bộ thành công!');
                 closeModal('candidateModal');
                 e.target.reset();
                 fetchCandidates();
             } catch (err) { showToast('Lỗi gửi dữ liệu!', 'error'); } 
-            finally { btn.disabled = false; btn.innerText = 'Lưu hồ sơ'; }
+            finally { btn.disabled = false; btn.innerText = 'Lưu & Đồng bộ'; }
         });
 
         function openDetailModal(email) {
@@ -385,36 +405,49 @@
         async function updateCandidate() {
             if (!currentEmail) return;
             const btn = document.getElementById('btnUpdate');
-            btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Đang lưu...`;
+            btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Đang đồng bộ...`;
             const data = {
                 ngay_phong_van: document.getElementById('upDate').value,
                 trang_thai: document.getElementById('upStatus').value,
                 ghi_chu: document.getElementById('upNote').value
             };
             try {
-                await fetch(`${SHEETDB_URL}/email/${encodeURIComponent(currentEmail)}`, {
+                // Cập nhật song song cả 2 sheet
+                const p1 = fetch(`${DB_HR}/email/${encodeURIComponent(currentEmail)}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ data })
                 });
 
+                const p2 = fetch(`${DB_AUTO}/email/${encodeURIComponent(currentEmail)}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data })
+                });
+
+                await Promise.all([p1, p2]);
+
                 if (document.getElementById('sendTgUpdate').checked) {
-                    const msg = `📝 <b>CẬP NHẬT PHỎNG VẤN</b>\n\n👤 <b>Tên:</b> ${currentEmail}\n📌 <b>Trạng thái mới:</b> ${data.trang_thai}\n📝 <b>Ghi chú:</b> ${data.ghi_chu}`;
+                    const msg = `📝 <b>CẬP NHẬT PHỎNG VẤN</b>\n\n👤 <b>Tên:</b> ${currentEmail}\n📌 <b>Trạng thái mới:</b> ${data.trang_thai}\n📅 <b>Ngày PV mới:</b> ${data.ngay_phong_van}`;
                     await sendTelegram(msg);
                 }
 
-                showToast('Đã cập nhật!');
+                showToast('Đã đồng bộ thông tin mới!');
                 closeModal('detailModal');
                 fetchCandidates();
             } catch (e) { showToast('Lỗi cập nhật!', 'error'); } 
-            finally { btn.disabled = false; btn.innerText = 'CẬP NHẬT & BÁO BOT'; }
+            finally { btn.disabled = false; btn.innerText = 'CẬP NHẬT HỆ THỐNG'; }
         }
 
         async function confirmDelete() {
-            if (!currentEmail || !confirm(`Xóa hồ sơ: ${currentEmail}?`)) return;
+            const c = allData.find(x => x.email === currentEmail);
+            if (!currentEmail || !confirm(`Xóa hồ sơ: ${c.ho_ten}?`)) return;
             try {
-                await fetch(`${SHEETDB_URL}/email/${encodeURIComponent(currentEmail)}`, { method: 'DELETE' });
-                showToast('Đã xóa hồ sơ!');
+                const p1 = fetch(`${DB_HR}/email/${encodeURIComponent(currentEmail)}`, { method: 'DELETE' });
+                const p2 = fetch(`${DB_AUTO}/email/${encodeURIComponent(currentEmail)}`, { method: 'DELETE' });
+                await Promise.all([p1, p2]);
+                
+                showToast('Đã xóa hồ sơ trên cả 2 hệ thống!');
                 closeModal('detailModal');
                 fetchCandidates();
             } catch (e) { showToast('Lỗi!', 'error'); }
