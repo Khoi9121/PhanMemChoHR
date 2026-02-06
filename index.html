@@ -3,27 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ thống Quản lý Phỏng vấn</title>
+    <title>HR Interview Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
         
         .loader {
             border: 3px solid #f3f3f3;
             border-radius: 50%;
-            border-top: 3px solid #4f46e5;
-            width: 20px;
-            height: 20px;
+            border-top: 3px solid #6366f1;
+            width: 24px;
+            height: 24px;
             animation: spin 1s linear infinite;
-            display: inline-block;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .modal-base {
-            transition: visibility 0.3s, opacity 0.3s;
+            transition: all 0.3s ease;
             visibility: hidden;
             opacity: 0;
             pointer-events: none;
@@ -34,92 +33,112 @@
             pointer-events: auto;
         }
         .modal-box {
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: scale(0.95) translateY(20px);
         }
-        .modal-base:not(.visible-custom) .modal-box {
-            transform: scale(0.9) translateY(20px);
-            opacity: 0;
+        .modal-base.visible-custom .modal-box {
+            transform: scale(1) translateY(0);
         }
 
-        .fc { --fc-border-color: #f3f4f6; --fc-button-bg-color: #4f46e5; --fc-button-border-color: #4f46e5; }
-        .fc-event { cursor: pointer; padding: 4px 8px; border-radius: 6px; font-weight: 600; border: none !important; }
+        .fc { --fc-border-color: #f1f5f9; --fc-button-bg-color: #6366f1; --fc-button-border-color: #6366f1; }
+        .fc-event { padding: 4px 10px; border-radius: 8px; font-weight: 600; border: none !important; font-size: 0.75rem; }
         
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #818cf8; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen text-gray-900">
+<body class="bg-[#f8fafc] min-h-screen text-slate-800 pb-12">
 
-    <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto px-6 pt-10">
         <!-- Header -->
-        <div class="flex flex-col md:flex-row justify-between items-start mb-6 gap-4">
-            <div class="text-left">
-                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight text-indigo-600">HR Interview Pro</h1>
-                <p class="text-gray-500 mt-1 flex items-center">
-                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></span>
-                    Hệ thống quản lý ứng viên thông minh
-                </p>
+        <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                        <i class="fas fa-users-rectangle text-xl"></i>
+                    </div>
+                    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Tuyển dụng <span class="text-indigo-600">Pro</span></h1>
+                </div>
+                <p class="text-slate-500 font-medium">Hệ thống quản lý ứng viên chuyên nghiệp</p>
             </div>
-            <div class="flex flex-wrap gap-3">
-                <button onclick="openCalendarModal()" class="bg-white hover:bg-gray-50 text-gray-700 font-bold py-3 px-5 rounded-2xl transition-all shadow-sm border border-gray-200 flex items-center">
-                    <i class="fas fa-calendar-alt mr-2 text-indigo-600"></i> LỊCH TRÌNH
+            <div class="flex gap-3">
+                <button onclick="openCalendarModal()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold py-3.5 px-6 rounded-2xl transition-all shadow-sm border border-slate-200 flex items-center group">
+                    <i class="fas fa-calendar-day mr-2 text-indigo-500 group-hover:scale-110 transition-transform"></i> Lịch phỏng vấn
                 </button>
-                <button onclick="openCandidateModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-2xl transition-all shadow-lg shadow-indigo-100 flex items-center">
-                    <i class="fas fa-user-plus mr-2 text-lg"></i> THÊM ỨNG VIÊN
+                <button onclick="openCandidateModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-8 rounded-2xl transition-all shadow-xl shadow-indigo-100 flex items-center group">
+                    <i class="fas fa-plus mr-2 group-hover:rotate-90 transition-transform"></i> Thêm ứng viên
                 </button>
             </div>
         </div>
 
-        <!-- Color Legend (Chú thích màu sắc) -->
-        <div class="flex flex-wrap items-center gap-4 mb-8 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2">Chú thích trạng thái:</span>
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-gray-400"></span>
-                <span class="text-xs font-semibold text-gray-600">Chưa phỏng vấn</span>
+        <!-- Stats Bar -->
+        <div id="stats" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
+            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+                <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Tổng số</p>
+                <p id="statTotal" class="text-2xl font-black text-slate-800">0</p>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-blue-500"></span>
-                <span class="text-xs font-semibold text-gray-600">Đã phỏng vấn</span>
+            <div class="bg-indigo-50/50 p-5 rounded-3xl border border-indigo-100/50 shadow-sm">
+                <p class="text-[10px] font-extrabold text-indigo-400 uppercase tracking-widest mb-1">Đã PV</p>
+                <p id="statInterviewed" class="text-2xl font-black text-indigo-600">0</p>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                <span class="text-xs font-semibold text-gray-600">Phù hợp</span>
+            <div class="bg-emerald-50/50 p-5 rounded-3xl border border-emerald-100/50 shadow-sm">
+                <p class="text-[10px] font-extrabold text-emerald-400 uppercase tracking-widest mb-1">Phù hợp</p>
+                <p id="statQualified" class="text-2xl font-black text-emerald-600">0</p>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
-                <span class="text-xs font-semibold text-gray-600">Đang xem xét</span>
+            <div class="bg-amber-50/50 p-5 rounded-3xl border border-amber-100/50 shadow-sm">
+                <p class="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest mb-1">Đang xét</p>
+                <p id="statPending" class="text-2xl font-black text-amber-600">0</p>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-red-500"></span>
-                <span class="text-xs font-semibold text-gray-600">Không phù hợp</span>
+            <div class="bg-rose-50/50 p-5 rounded-3xl border border-rose-100/50 shadow-sm col-span-2 md:col-span-1">
+                <p class="text-[10px] font-extrabold text-rose-400 uppercase tracking-widest mb-1">Loại</p>
+                <p id="statRejected" class="text-2xl font-black text-rose-600">0</p>
             </div>
         </div>
 
-        <!-- Table View -->
-        <div class="bg-white rounded-3xl shadow-sm overflow-hidden border border-gray-100">
-            <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Danh sách ứng viên</h2>
-                <button onclick="fetchCandidates()" class="text-gray-400 hover:text-indigo-600 transition-colors"><i class="fas fa-sync-alt"></i></button>
+        <!-- Filters -->
+        <div class="flex flex-col md:flex-row gap-4 mb-6">
+            <div class="flex-1 glass-card p-2 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-2">
+                <div class="flex items-center pl-3 text-slate-400"><i class="fas fa-search"></i></div>
+                <input type="text" id="filterPosition" onkeyup="filterData()" placeholder="Tìm vị trí..." class="w-full bg-transparent border-none outline-none py-2 text-sm font-semibold text-slate-700">
+                <div class="h-6 w-px bg-slate-200"></div>
+                <div class="flex items-center gap-2 px-3">
+                    <input type="date" id="filterStart" onchange="filterData()" class="bg-transparent border-none outline-none text-xs font-bold text-slate-500 cursor-pointer">
+                    <span class="text-slate-300 text-xs font-bold">→</span>
+                    <input type="date" id="filterEnd" onchange="filterData()" class="bg-transparent border-none outline-none text-xs font-bold text-slate-500 cursor-pointer">
+                </div>
+                <button onclick="resetFilters()" class="px-4 py-2 text-xs font-black text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors uppercase tracking-tighter">Xóa lọc</button>
+            </div>
+        </div>
+
+        <!-- Main Table -->
+        <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
+                <h2 class="text-lg font-extrabold text-slate-800">Danh sách ứng tuyển</h2>
+                <div class="flex items-center gap-4">
+                    <span id="resultCount" class="px-2 py-0.5 bg-slate-200 text-slate-500 text-[10px] rounded-md font-bold uppercase tracking-tighter">Đang tải...</span>
+                    <button onclick="fetchCandidates()" class="p-2 text-slate-400 hover:text-indigo-600 transition-colors"><i class="fas fa-sync-alt"></i></button>
+                </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-gray-50/50">
-                            <th class="px-8 py-4 text-xs font-bold text-gray-400 uppercase">Ứng viên</th>
-                            <th class="px-8 py-4 text-xs font-bold text-gray-400 uppercase text-center">Ngày PV</th>
-                            <th class="px-8 py-4 text-xs font-bold text-gray-400 uppercase text-center">Trạng thái</th>
-                            <th class="px-8 py-4 text-xs font-bold text-gray-400 uppercase text-right">Thao tác</th>
+                        <tr class="bg-slate-50/50">
+                            <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest">Ứng viên</th>
+                            <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Ngày PV</th>
+                            <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Trạng thái</th>
+                            <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right">Chi tiết</th>
                         </tr>
                     </thead>
-                    <tbody id="candidateTableBody" class="divide-y divide-gray-50">
-                        <tr><td colspan="4" class="py-20 text-center">
-                            <div class="flex flex-col items-center">
-                                <span class="loader mb-2"></span>
-                                <p class="text-gray-400 italic">Đang tải dữ liệu...</p>
-                            </div>
+                    <tbody id="candidateTableBody" class="divide-y divide-slate-100">
+                        <tr><td colspan="4" class="py-24 text-center">
+                            <div class="flex flex-col items-center"><div class="loader mb-4"></div><p class="text-slate-400 italic">Đang tải dữ liệu...</p></div>
                         </td></tr>
                     </tbody>
                 </table>
@@ -127,286 +146,217 @@
         </div>
     </div>
 
-    <!-- Modal: Thêm Ứng Viên -->
+    <!-- MODAL: THÊM ỨNG VIÊN -->
     <div id="candidateModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-base">
-        <div onclick="closeModal('candidateModal')" class="absolute inset-0 bg-gray-900/40 backdrop-blur-md"></div>
-        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md relative z-10 modal-box overflow-hidden">
-            <div class="p-8 border-b border-gray-50 flex justify-between items-center">
-                <h3 class="text-2xl font-bold text-gray-900">Ứng viên mới</h3>
-                <button onclick="closeModal('candidateModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+        <div onclick="closeModal('candidateModal')" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 modal-box overflow-hidden">
+            <div class="px-10 pt-10 pb-6 flex justify-between items-center">
+                <h3 class="text-2xl font-black text-slate-900">Ứng viên mới</h3>
+                <button onclick="closeModal('candidateModal')" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200"><i class="fas fa-times"></i></button>
             </div>
-            <form id="candidateForm" class="p-8 space-y-4">
-                <input type="text" name="ho_ten" required placeholder="Họ và Tên" class="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none focus:border-indigo-500 font-medium bg-gray-50/50">
+            <form id="candidateForm" class="px-10 pb-10 space-y-5">
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="email" name="email" required placeholder="Email" class="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none focus:border-indigo-500 font-medium bg-gray-50/50">
-                    <input type="tel" name="sdt" required placeholder="SĐT" class="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none focus:border-indigo-500 font-medium bg-gray-50/50">
+                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Họ tên</label><input type="text" name="ho_ten" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></div>
+                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Vị trí</label><input type="text" name="vi_tri" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></div>
                 </div>
-                <input type="date" id="dateInput" name="ngay_phong_van" required class="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none focus:border-indigo-500 font-medium bg-gray-50/50">
-                <textarea name="ghi_chu" placeholder="Ghi chú ban đầu..." rows="3" class="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none focus:border-indigo-500 font-medium bg-gray-50/50"></textarea>
-                <div class="pt-4 flex gap-4">
-                    <button type="submit" id="btnSubmit" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg">LƯU THÔNG TIN</button>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Email</label><input type="email" name="email" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></div>
+                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">SĐT</label><input type="tel" name="sdt" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></div>
                 </div>
+                <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Ngày dự kiến PV</label><input type="date" id="dateInput" name="ngay_phong_van" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-bold text-slate-600"></div>
+                <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Ghi chú</label><textarea name="ghi_chu" rows="3" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></textarea></div>
+                <button type="submit" id="btnSubmit" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 transition-all uppercase tracking-wider">Thêm ứng viên</button>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Lịch Hẹn -->
-    <div id="calendarModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-base">
-        <div onclick="closeModal('calendarModal')" class="absolute inset-0 bg-gray-900/60 backdrop-blur-md"></div>
-        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-5xl h-[90vh] relative z-10 modal-box overflow-hidden flex flex-col">
-            <div class="p-6 border-b border-gray-50 flex justify-between items-center">
-                <h3 class="text-2xl font-bold">Lịch Phỏng vấn</h3>
-                <button onclick="closeModal('calendarModal')" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-6" id="calendar"></div>
-        </div>
-    </div>
-
-    <!-- Modal: Chi Tiết Ứng Viên -->
+    <!-- MODAL: CHI TIẾT & CẬP NHẬT & XÓA -->
     <div id="detailModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 modal-base">
-        <div onclick="closeModal('detailModal')" class="absolute inset-0 bg-indigo-900/40 backdrop-blur-lg"></div>
+        <div onclick="closeModal('detailModal')" class="absolute inset-0 bg-slate-900/60 backdrop-blur-md"></div>
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 modal-box overflow-hidden">
-            <div id="detailContent" class="p-8 space-y-6">
-                <!-- Nội dung được đổ bằng JS -->
-                <div class="flex justify-center py-10"><span class="loader"></span></div>
-            </div>
-            <div class="p-8 bg-gray-50 flex gap-4">
-                <button onclick="closeModal('detailModal')" class="flex-1 py-4 font-bold text-gray-400 hover:text-gray-600 transition-colors">ĐÓNG</button>
-                <button onclick="updateCandidate()" id="btnUpdate" class="flex-[2] bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-indigo-700 transition-all">CẬP NHẬT THÔNG TIN</button>
+            <div id="detailContent" class="p-10 space-y-6"></div>
+            <div class="p-8 bg-slate-50 border-t border-slate-100 flex flex-wrap gap-4">
+                <button onclick="confirmDelete()" id="btnDelete" class="w-12 h-12 flex items-center justify-center bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white rounded-2xl transition-all shadow-sm border border-rose-100"><i class="fas fa-trash-alt"></i></button>
+                <button onclick="closeModal('detailModal')" class="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600 text-sm">HỦY</button>
+                <button onclick="updateCandidate()" id="btnUpdate" class="flex-[3] bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 text-sm tracking-wide">CẬP NHẬT</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast -->
-    <div id="toast" class="fixed bottom-12 left-1/2 transform -translate-x-1/2 translate-y-32 opacity-0 transition-all duration-500 bg-gray-900 text-white px-8 py-4 rounded-[2rem] z-[100] flex items-center">
-        <i class="fas fa-check-circle mr-3 text-green-400" id="toastIcon"></i>
+    <!-- MODAL: LỊCH TRÌNH -->
+    <div id="calendarModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-base">
+        <div onclick="closeModal('calendarModal')" class="absolute inset-0 bg-slate-900/70 backdrop-blur-lg"></div>
+        <div class="bg-white rounded-[3rem] shadow-2xl w-full max-w-5xl h-[85vh] relative z-10 modal-box overflow-hidden flex flex-col">
+            <div class="p-8 border-b border-slate-50 flex justify-between items-center"><h3 class="text-2xl font-black text-slate-900">Lịch phỏng vấn</h3><button onclick="closeModal('calendarModal')" class="w-12 h-12 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-slate-100"><i class="fas fa-times"></i></button></div>
+            <div class="flex-1 p-8 overflow-y-auto" id="calendar"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 translate-y-32 opacity-0 transition-all duration-500 bg-slate-900 text-white px-8 py-4 rounded-full z-[100] flex items-center shadow-2xl">
+        <div id="toastIconBox" class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center mr-3"><i class="fas fa-check text-[10px]" id="toastIcon"></i></div>
         <span id="toastMsg" class="font-bold text-sm">Thông báo</span>
     </div>
 
     <script>
-        const SHEETDB_API_URL = 'https://sheetdb.io/api/v1/54rgcr47hqclf';
-        let currentCandidates = [];
-        let selectedCandidate = null;
-        let calendar = null;
+        const SHEETDB_URL = 'https://sheetdb.io/api/v1/54rgcr47hqclf';
+        let allData = [];
+        let displayData = [];
+        let currentEmail = null;
+        let fcCalendar = null;
 
-        // Hàm hỗ trợ lấy màu dựa theo trạng thái
-        function getStatusColor(status) {
-            switch(status) {
-                case 'Phù hợp': return '#10b981'; // Green-500
-                case 'Không phù hợp': return '#f43f5e'; // Rose-500
-                case 'Đang xem xét': return '#f59e0b'; // Amber-500
-                case 'Đã phỏng vấn': return '#3b82f6'; // Blue-500
-                default: return '#9ca3af'; // Gray-400 (Chưa phỏng vấn)
+        const getStatusTheme = (s) => {
+            switch(s) {
+                case 'Phù hợp': return { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100', dot: 'bg-emerald-500', hex: '#10b981' };
+                case 'Không phù hợp': return { bg: 'bg-rose-50', text: 'text-rose-600', border: 'border-rose-100', dot: 'bg-rose-500', hex: '#f43f5e' };
+                case 'Đã phỏng vấn': return { bg: 'bg-indigo-50', text: 'text-indigo-600', border: 'border-indigo-100', dot: 'bg-indigo-500', hex: '#6366f1' };
+                case 'Đang xem xét': return { bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-100', dot: 'bg-amber-500', hex: '#f59e0b' };
+                default: return { bg: 'bg-slate-50', text: 'text-slate-500', border: 'border-slate-100', dot: 'bg-slate-400', hex: '#94a3b8' };
+            }
+        };
+
+        async function fetchCandidates() {
+            try {
+                const res = await fetch(SHEETDB_URL);
+                allData = await res.json();
+                filterData();
+            } catch (err) {
+                document.getElementById('candidateTableBody').innerHTML = `<tr><td colspan="4" class="py-10 text-center text-rose-500 font-bold italic">Lỗi kết nối máy chủ!</td></tr>`;
             }
         }
 
-        // Quản lý Modal
-        function openCandidateModal() {
-            document.getElementById('candidateModal').classList.add('visible-custom');
-            document.getElementById('dateInput').valueAsDate = new Date();
+        function filterData() {
+            const pos = document.getElementById('filterPosition').value.toLowerCase();
+            const start = document.getElementById('filterStart').value;
+            const end = document.getElementById('filterEnd').value;
+            displayData = allData.filter(c => {
+                const cPos = (c.vi_tri || '').toLowerCase();
+                const cDate = new Date(c.ngay_phong_van);
+                const sDate = start ? new Date(start) : null;
+                const eDate = end ? new Date(end) : null;
+                if (pos && !cPos.includes(pos)) return false;
+                if (sDate && cDate < sDate) return false;
+                if (eDate && cDate > eDate) return false;
+                return true;
+            });
+            renderUI();
+        }
+
+        function renderUI() {
+            const body = document.getElementById('candidateTableBody');
+            if (displayData.length === 0) {
+                body.innerHTML = `<tr><td colspan="4" class="py-20 text-center text-slate-400 font-medium italic">Không có ứng viên phù hợp</td></tr>`;
+                updateDashboard(0,0,0,0,0);
+                return;
+            }
+            body.innerHTML = displayData.sort((a,b) => new Date(b.ngay_phong_van) - new Date(a.ngay_phong_van)).map(c => {
+                const theme = getStatusTheme(c.trang_thai);
+                return `<tr class="hover:bg-slate-50/50 transition cursor-pointer group" onclick="openDetailModal('${c.email}')">
+                    <td class="px-8 py-5">
+                        <div class="font-bold text-slate-900">${c.ho_ten}</div>
+                        <div class="flex items-center gap-2 mt-1"><span class="bg-indigo-600 text-white text-[9px] px-2 py-0.5 rounded-md font-black uppercase tracking-widest">${c.vi_tri || 'N/A'}</span><span class="text-xs text-slate-400 font-medium">${c.email}</span></div>
+                    </td>
+                    <td class="px-8 py-5 text-center"><span class="text-sm font-bold text-slate-500 tabular-nums">${c.ngay_phong_van}</span></td>
+                    <td class="px-8 py-5 text-center"><span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-wider ${theme.bg} ${theme.text} ${theme.border}"><span class="w-1.5 h-1.5 rounded-full ${theme.dot}"></span>${c.trang_thai || 'Chưa PV'}</span></td>
+                    <td class="px-8 py-5 text-right"><button class="w-10 h-10 rounded-xl bg-slate-50 text-slate-300 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 flex items-center justify-center ml-auto"><i class="fas fa-chevron-right text-xs"></i></button></td>
+                </tr>`;
+            }).join('');
+            updateDashboard(displayData.length, displayData.filter(d => d.trang_thai === 'Đã phỏng vấn').length, displayData.filter(d => d.trang_thai === 'Phù hợp').length, displayData.filter(d => d.trang_thai === 'Đang xem xét').length, displayData.filter(d => d.trang_thai === 'Không phù hợp').length);
+            document.getElementById('resultCount').innerText = `${displayData.length} ứng viên`;
+            if (fcCalendar) refreshCalendar();
+        }
+
+        function updateDashboard(t, i, q, p, r) {
+            document.getElementById('statTotal').innerText = t;
+            document.getElementById('statInterviewed').innerText = i;
+            document.getElementById('statQualified').innerText = q;
+            document.getElementById('statPending').innerText = p;
+            document.getElementById('statRejected').innerText = r;
+        }
+
+        function openCandidateModal() { document.getElementById('candidateModal').classList.add('visible-custom'); document.getElementById('dateInput').valueAsDate = new Date(); }
+        function closeModal(id) { document.getElementById(id).classList.remove('visible-custom'); }
+
+        document.getElementById('candidateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Đang thêm...`;
+            const data = Object.fromEntries(new FormData(e.target).entries());
+            data.trang_thai = "Chưa phỏng vấn";
+            try {
+                await fetch(SHEETDB_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: [data] }) });
+                showToast('Thêm ứng viên thành công!'); closeModal('candidateModal'); e.target.reset(); fetchCandidates();
+            } catch (err) { showToast('Lỗi khi thêm ứng viên!', 'error'); } finally { btn.disabled = false; btn.innerText = 'Thêm ứng viên'; }
+        });
+
+        function openDetailModal(email) {
+            const c = allData.find(x => x.email === email);
+            if (!c) return;
+            currentEmail = email;
+            const theme = getStatusTheme(c.trang_thai);
+            document.getElementById('detailModal').classList.add('visible-custom');
+            document.getElementById('detailContent').innerHTML = `
+                <div class="flex items-center gap-6"><div class="w-20 h-20 rounded-3xl flex items-center justify-center text-white text-3xl font-black shadow-lg" style="background: ${theme.hex}">${c.ho_ten.charAt(0)}</div><div><h2 class="text-3xl font-black text-slate-900">${c.ho_ten}</h2><div class="mt-2"><span class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-xl text-xs font-black uppercase tracking-widest">${c.vi_tri || 'N/A'}</span></div></div></div>
+                <div class="grid grid-cols-2 gap-4"><div class="p-5 bg-slate-50 rounded-3xl border border-slate-100"><p class="text-[10px] font-black text-slate-400 uppercase mb-1">Email</p><p class="font-bold text-slate-700 truncate">${c.email}</p></div><div class="p-5 bg-slate-50 rounded-3xl border border-slate-100"><p class="text-[10px] font-black text-slate-400 uppercase mb-1">SĐT</p><p class="font-bold text-slate-700">${c.sdt}</p></div></div>
+                <div class="grid grid-cols-2 gap-4"><div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Ngày PV</label><input type="date" id="upDate" value="${c.ngay_phong_van}" class="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 outline-none"></div><div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Đánh giá</label><select id="upStatus" class="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl font-bold text-slate-700 outline-none"><option value="Chưa phỏng vấn" ${c.trang_thai === 'Chưa phỏng vấn' ? 'selected' : ''}>Chưa PV</option><option value="Đã phỏng vấn" ${c.trang_thai === 'Đã phỏng vấn' ? 'selected' : ''}>Đã PV</option><option value="Phù hợp" ${c.trang_thai === 'Phù hợp' ? 'selected' : ''}>Phù hợp</option><option value="Không phù hợp" ${c.trang_thai === 'Không phù hợp' ? 'selected' : ''}>Loại</option><option value="Đang xem xét" ${c.trang_thai === 'Đang xem xét' ? 'selected' : ''}>Đang xét</option></select></div></div>
+                <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Nhận xét chi tiết</label><textarea id="upNote" rows="4" class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-3xl font-medium text-slate-600 outline-none" placeholder="Nhận xét...">${c.ghi_chu || ''}</textarea></div>`;
+        }
+
+        async function updateCandidate() {
+            if (!currentEmail) return;
+            const btn = document.getElementById('btnUpdate'); btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Đang lưu...`;
+            const data = { ngay_phong_van: document.getElementById('upDate').value, trang_thai: document.getElementById('upStatus').value, ghi_chu: document.getElementById('upNote').value };
+            try {
+                await fetch(`${SHEETDB_URL}/email/${encodeURIComponent(currentEmail)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data }) });
+                showToast('Đã cập nhật thay đổi!'); closeModal('detailModal'); fetchCandidates();
+            } catch (e) { showToast('Lỗi khi cập nhật!', 'error'); } finally { btn.disabled = false; btn.innerText = 'CẬP NHẬT'; }
+        }
+
+        async function confirmDelete() {
+            if (!currentEmail) return;
+            if (confirm(`Bạn có chắc chắn muốn xóa hồ sơ của ứng viên có email: ${currentEmail}?`)) {
+                const btn = document.getElementById('btnDelete');
+                btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+                try {
+                    await fetch(`${SHEETDB_URL}/email/${encodeURIComponent(currentEmail)}`, { method: 'DELETE' });
+                    showToast('Đã xóa hồ sơ ứng viên!', 'success');
+                    closeModal('detailModal');
+                    fetchCandidates();
+                } catch (e) { showToast('Lỗi khi xóa hồ sơ!', 'error'); } finally { btn.disabled = false; btn.innerHTML = `<i class="fas fa-trash-alt"></i>`; }
+            }
         }
 
         function openCalendarModal() {
             document.getElementById('calendarModal').classList.add('visible-custom');
             setTimeout(() => {
-                if (!calendar) {
-                    calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-                        initialView: 'dayGridMonth',
-                        locale: 'vi',
+                if (!fcCalendar) {
+                    fcCalendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+                        initialView: 'dayGridMonth', locale: 'vi',
                         headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
-                        events: generateEvents(),
+                        buttonText: { today: 'Hôm nay', month: 'Tháng', week: 'Tuần' },
+                        events: displayData.map(c => ({ title: `[${c.vi_tri || '?'}] ${c.ho_ten}`, start: c.ngay_phong_van, backgroundColor: getStatusTheme(c.trang_thai).hex, extendedProps: { email: c.email } })),
                         eventClick: (info) => openDetailModal(info.event.extendedProps.email)
                     });
-                } else {
-                    calendar.removeAllEvents();
-                    calendar.addEventSource(generateEvents());
-                }
-                calendar.render();
-            }, 100);
+                } else { refreshCalendar(); }
+                fcCalendar.render();
+            }, 300);
         }
 
-        function openDetailModal(email) {
-            selectedCandidate = currentCandidates.find(c => c.email === email);
-            if (!selectedCandidate) return;
-
-            document.getElementById('detailModal').classList.add('visible-custom');
-            const content = document.getElementById('detailContent');
-            
-            content.innerHTML = `
-                <div class="flex items-center gap-5">
-                    <div class="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold" style="background-color: ${getStatusColor(selectedCandidate.trang_thai)}">
-                        ${selectedCandidate.ho_ten.charAt(0)}
-                    </div>
-                    <div>
-                        <h2 class="text-2xl font-black text-gray-900">${selectedCandidate.ho_ten}</h2>
-                        <p class="text-indigo-500 font-semibold flex items-center">
-                            <i class="far fa-calendar-check mr-2"></i> ${selectedCandidate.ngay_phong_van}
-                        </p>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4 text-sm font-medium">
-                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                        <p class="text-gray-400 text-[10px] uppercase font-bold mb-1">Email</p>
-                        <p class="truncate font-bold">${selectedCandidate.email}</p>
-                    </div>
-                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                        <p class="text-gray-400 text-[10px] uppercase font-bold mb-1">Số điện thoại</p>
-                        <p class="font-bold">${selectedCandidate.sdt}</p>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Trạng thái hiện tại</label>
-                    <select id="updateStatus" class="w-full px-5 py-3 border border-gray-200 rounded-2xl font-bold text-gray-700 bg-white outline-none focus:ring-4 focus:ring-indigo-500/10">
-                        <option value="Chưa phỏng vấn" ${selectedCandidate.trang_thai === 'Chưa phỏng vấn' ? 'selected' : ''}>Chưa phỏng vấn</option>
-                        <option value="Đã phỏng vấn" ${selectedCandidate.trang_thai === 'Đã phỏng vấn' ? 'selected' : ''}>Đã phỏng vấn</option>
-                        <option value="Phù hợp" ${selectedCandidate.trang_thai === 'Phù hợp' ? 'selected' : ''}>Phù hợp</option>
-                        <option value="Không phù hợp" ${selectedCandidate.trang_thai === 'Không phù hợp' ? 'selected' : ''}>Không phù hợp</option>
-                        <option value="Đang xem xét" ${selectedCandidate.trang_thai === 'Đang xem xét' ? 'selected' : ''}>Đang xem xét</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Ghi chú & Nhận xét</label>
-                    <textarea id="updateNote" rows="4" class="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/10 bg-gray-50/30" placeholder="Nhập nhận xét chi tiết sau phỏng vấn...">${selectedCandidate.ghi_chu || ''}</textarea>
-                </div>
-            `;
+        function refreshCalendar() {
+            fcCalendar.removeAllEvents();
+            fcCalendar.addEventSource(displayData.map(c => ({ title: `[${c.vi_tri || '?'}] ${c.ho_ten}`, start: c.ngay_phong_van, backgroundColor: getStatusTheme(c.trang_thai).hex, extendedProps: { email: c.email } })));
         }
 
-        async function updateCandidate() {
-            if (!selectedCandidate) return;
-            const btn = document.getElementById('btnUpdate');
-            const newStatus = document.getElementById('updateStatus').value;
-            const newNote = document.getElementById('updateNote').value;
-
-            btn.disabled = true;
-            btn.innerHTML = `<span class="loader border-white/30 border-t-white w-4 h-4 mr-2"></span> ĐANG CẬP NHẬT...`;
-
-            try {
-                const response = await fetch(`${SHEETDB_API_URL}/email/${encodeURIComponent(selectedCandidate.email)}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        data: {
-                            trang_thai: newStatus,
-                            ghi_chu: newNote
-                        }
-                    })
-                });
-
-                if (response.ok) {
-                    showToast('Cập nhật trạng thái thành công!');
-                    closeModal('detailModal');
-                    fetchCandidates();
-                } else {
-                    throw new Error('Update Failed');
-                }
-            } catch (error) {
-                showToast('Lỗi: ' + error.message, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'CẬP NHẬT THÔNG TIN';
-            }
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('visible-custom');
-        }
-
-        function generateEvents() {
-            return currentCandidates.map(c => ({
-                title: c.ho_ten, 
-                start: c.ngay_phong_van, 
-                backgroundColor: getStatusColor(c.trang_thai), 
-                extendedProps: { email: c.email } 
-            }));
-        }
-
-        async function fetchCandidates() {
-            const body = document.getElementById('candidateTableBody');
-            try {
-                const response = await fetch(SHEETDB_API_URL);
-                currentCandidates = await response.json();
-                renderTable(currentCandidates);
-                if (calendar) {
-                    calendar.removeAllEvents();
-                    calendar.addEventSource(generateEvents());
-                }
-            } catch (error) {
-                body.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-red-500">Lỗi kết nối API.</td></tr>`;
-            }
-        }
-
-        function renderTable(list) {
-            const body = document.getElementById('candidateTableBody');
-            if (!list.length) {
-                body.innerHTML = `<tr><td colspan="4" class="text-center py-20 text-gray-400">Danh sách ứng viên đang trống.</td></tr>`;
-                return;
-            }
-            body.innerHTML = [...list].reverse().map(c => {
-                let statusStyle = 'bg-gray-100 text-gray-500 border-gray-100';
-                if (c.trang_thai === 'Phù hợp') statusStyle = 'bg-green-50 text-green-600 border-green-100';
-                else if (c.trang_thai === 'Không phù hợp') statusStyle = 'bg-red-50 text-red-600 border-red-100';
-                else if (c.trang_thai === 'Đã phỏng vấn') statusStyle = 'bg-blue-50 text-blue-600 border-blue-100';
-                else if (c.trang_thai === 'Đang xem xét') statusStyle = 'bg-yellow-50 text-yellow-600 border-yellow-100';
-
-                return `
-                    <tr class="hover:bg-gray-50/50 transition cursor-pointer" onclick="openDetailModal('${c.email}')">
-                        <td class="px-8 py-5">
-                            <div class="font-bold text-gray-900">${c.ho_ten}</div>
-                            <div class="text-xs text-gray-400 font-medium">${c.email}</div>
-                        </td>
-                        <td class="px-8 py-5 text-center font-bold text-gray-500 text-sm italic">${c.ngay_phong_van}</td>
-                        <td class="px-8 py-5 text-center">
-                            <span class="px-3 py-1.5 rounded-full text-[10px] font-black border uppercase tracking-widest ${statusStyle}">
-                                ${c.trang_thai}
-                            </span>
-                        </td>
-                        <td class="px-8 py-5 text-right">
-                            <button class="w-8 h-8 rounded-full hover:bg-indigo-50 text-indigo-300 hover:text-indigo-600 transition-colors">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        document.getElementById('candidateForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btnSubmit');
-            btn.disabled = true;
-            btn.innerText = 'ĐANG XỬ LÝ...';
-
-            const payload = { data: [Object.fromEntries(new FormData(e.target).entries())] };
-            payload.data[0].trang_thai = "Chưa phỏng vấn";
-
-            try {
-                const res = await fetch(SHEETDB_API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    showToast('Đã thêm ứng viên mới!');
-                    closeModal('candidateModal');
-                    fetchCandidates();
-                    e.target.reset();
-                }
-            } catch (err) {
-                showToast('Lỗi lưu dữ liệu', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'LƯU THÔNG TIN';
-            }
-        });
-
-        function showToast(m, type = 'success') {
+        function showToast(msg, type = 'success') {
             const t = document.getElementById('toast');
-            document.getElementById('toastMsg').innerText = m;
-            document.getElementById('toastIcon').className = type === 'error' ? 'fas fa-exclamation-circle mr-3 text-red-400' : 'fas fa-check-circle mr-3 text-green-400';
-            t.classList.remove('translate-y-32', 'opacity-0');
-            setTimeout(() => t.classList.add('translate-y-32', 'opacity-0'), 3000);
+            document.getElementById('toastMsg').innerText = msg;
+            const box = document.getElementById('toastIconBox');
+            if (type === 'error') { box.classList.replace('bg-emerald-500', 'bg-rose-500'); document.getElementById('toastIcon').className = 'fas fa-exclamation text-[10px]'; } 
+            else { box.classList.replace('bg-rose-500', 'bg-emerald-500'); document.getElementById('toastIcon').className = 'fas fa-check text-[10px]'; }
+            t.classList.remove('translate-y-32', 'opacity-0'); setTimeout(() => t.classList.add('translate-y-32', 'opacity-0'), 3000);
         }
 
+        function resetFilters() { document.getElementById('filterPosition').value = ''; document.getElementById('filterStart').value = ''; document.getElementById('filterEnd').value = ''; filterData(); }
         window.onload = fetchCandidates;
     </script>
 </body>
