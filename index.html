@@ -66,22 +66,22 @@
                     </div>
                     <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Tuyển dụng <span class="text-indigo-600">Pro</span></h1>
                 </div>
-                <p class="text-slate-500 font-medium">Hệ thống quản lý ứng viên chuyên nghiệp</p>
+                <p class="text-slate-500 font-medium">Quản lý ứng viên & Nhận xét phỏng vấn</p>
             </div>
             <div class="flex gap-3">
                 <button onclick="openCalendarModal()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold py-3.5 px-6 rounded-2xl transition-all shadow-sm border border-slate-200 flex items-center group">
-                    <i class="fas fa-calendar-day mr-2 text-indigo-500 group-hover:scale-110 transition-transform"></i> Lịch phỏng vấn
+                    <i class="fas fa-calendar-day mr-2 text-indigo-500 group-hover:scale-110 transition-transform"></i> Xem lịch
                 </button>
                 <button onclick="openCandidateModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-8 rounded-2xl transition-all shadow-xl shadow-indigo-100 flex items-center group">
-                    <i class="fas fa-plus mr-2 group-hover:rotate-90 transition-transform"></i> Thêm ứng viên
+                    <i class="fas fa-plus mr-2 group-hover:rotate-90 transition-transform"></i> Thêm mới
                 </button>
             </div>
         </div>
 
-        <!-- Stats Bar -->
+        <!-- Dashboard Stats -->
         <div id="stats" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
             <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
-                <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Tổng số</p>
+                <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Tổng hồ sơ</p>
                 <p id="statTotal" class="text-2xl font-black text-slate-800">0</p>
             </div>
             <div class="bg-indigo-50/50 p-5 rounded-3xl border border-indigo-100/50 shadow-sm">
@@ -96,7 +96,7 @@
                 <p class="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest mb-1">Đang xét</p>
                 <p id="statPending" class="text-2xl font-black text-amber-600">0</p>
             </div>
-            <div class="bg-rose-50/50 p-5 rounded-3xl border border-rose-100/50 shadow-sm col-span-2 md:col-span-1">
+            <div class="bg-rose-50/50 p-5 rounded-3xl border border-rose-100/50 shadow-sm">
                 <p class="text-[10px] font-extrabold text-rose-400 uppercase tracking-widest mb-1">Loại</p>
                 <p id="statRejected" class="text-2xl font-black text-rose-600">0</p>
             </div>
@@ -106,96 +106,90 @@
         <div class="flex flex-col md:flex-row gap-4 mb-6">
             <div class="flex-1 glass-card p-2 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-2">
                 <div class="flex items-center pl-3 text-slate-400"><i class="fas fa-search"></i></div>
-                <input type="text" id="filterPosition" onkeyup="filterData()" placeholder="Tìm vị trí..." class="w-full bg-transparent border-none outline-none py-2 text-sm font-semibold text-slate-700">
-                <div class="h-6 w-px bg-slate-200"></div>
-                <div class="flex items-center gap-2 px-3">
-                    <input type="date" id="filterStart" onchange="filterData()" class="bg-transparent border-none outline-none text-xs font-bold text-slate-500 cursor-pointer">
-                    <span class="text-slate-300 text-xs font-bold">→</span>
-                    <input type="date" id="filterEnd" onchange="filterData()" class="bg-transparent border-none outline-none text-xs font-bold text-slate-500 cursor-pointer">
-                </div>
-                <button onclick="resetFilters()" class="px-4 py-2 text-xs font-black text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors uppercase tracking-tighter">Xóa lọc</button>
+                <input type="text" id="filterPosition" onkeyup="filterData()" placeholder="Lọc theo vị trí ứng tuyển..." class="w-full bg-transparent border-none outline-none py-2 text-sm font-semibold text-slate-700">
+                <button onclick="resetFilters()" class="px-4 py-2 text-xs font-black text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors uppercase">Đặt lại</button>
             </div>
         </div>
 
-        <!-- Main Table -->
+        <!-- List Table -->
         <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
             <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
-                <h2 class="text-lg font-extrabold text-slate-800">Danh sách ứng tuyển</h2>
-                <div class="flex items-center gap-4">
-                    <span id="resultCount" class="px-2 py-0.5 bg-slate-200 text-slate-500 text-[10px] rounded-md font-bold uppercase tracking-tighter">Đang tải...</span>
-                    <button onclick="fetchCandidates()" class="p-2 text-slate-400 hover:text-indigo-600 transition-colors"><i class="fas fa-sync-alt"></i></button>
-                </div>
+                <h2 class="text-lg font-extrabold text-slate-800 flex items-center">
+                    Danh sách ứng viên
+                    <span id="resultCount" class="ml-3 px-2 py-0.5 bg-slate-200 text-slate-500 text-[10px] rounded-md font-bold italic">...</span>
+                </h2>
+                <button onclick="fetchCandidates()" class="p-2 text-slate-400 hover:text-indigo-600 transition-colors"><i class="fas fa-sync-alt"></i></button>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-slate-50/50">
-                            <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest">Ứng viên</th>
+                            <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest">Họ tên & Vị trí</th>
                             <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Ngày PV</th>
                             <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Trạng thái</th>
                             <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right">Chi tiết</th>
                         </tr>
                     </thead>
                     <tbody id="candidateTableBody" class="divide-y divide-slate-100">
-                        <tr><td colspan="4" class="py-24 text-center">
-                            <div class="flex flex-col items-center"><div class="loader mb-4"></div><p class="text-slate-400 italic">Đang tải dữ liệu...</p></div>
-                        </td></tr>
+                        <!-- Content here -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: THÊM ỨNG VIÊN -->
+    <!-- MODAL: ADD CANDIDATE -->
     <div id="candidateModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-base">
         <div onclick="closeModal('candidateModal')" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 modal-box overflow-hidden">
             <div class="px-10 pt-10 pb-6 flex justify-between items-center">
-                <h3 class="text-2xl font-black text-slate-900">Ứng viên mới</h3>
+                <h3 class="text-2xl font-black text-slate-900">Hồ sơ mới</h3>
                 <button onclick="closeModal('candidateModal')" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200"><i class="fas fa-times"></i></button>
             </div>
             <form id="candidateForm" class="px-10 pb-10 space-y-5">
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Họ tên</label><input type="text" name="ho_ten" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></div>
-                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Vị trí</label><input type="text" name="vi_tri" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></div>
+                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Họ tên</label><input type="text" name="ho_ten" required placeholder="Nguyễn Văn A" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></div>
+                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Vị trí</label><input type="text" name="vi_tri" required placeholder="VD: Kế toán" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Email</label><input type="email" name="email" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></div>
-                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">SĐT</label><input type="tel" name="sdt" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></div>
+                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Email</label><input type="email" name="email" required placeholder="name@company.com" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></div>
+                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">SĐT</label><input type="tel" name="sdt" required placeholder="090..." class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></div>
                 </div>
-                <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Ngày dự kiến PV</label><input type="date" id="dateInput" name="ngay_phong_van" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-bold text-slate-600"></div>
-                <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Ghi chú</label><textarea name="ghi_chu" rows="3" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></textarea></div>
-                <button type="submit" id="btnSubmit" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 transition-all uppercase tracking-wider">Thêm ứng viên</button>
+                <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Ngày phỏng vấn</label><input type="date" id="dateInput" name="ngay_phong_van" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-bold text-slate-600"></div>
+                <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Ghi chú/Nhận xét ban đầu</label><textarea name="ghi_chu" rows="3" placeholder="Ghi chú về ứng viên..." class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-indigo-500 font-semibold"></textarea></div>
+                <button type="submit" id="btnSubmit" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 transition-all uppercase tracking-wider">Lưu hồ sơ</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: CHI TIẾT & CẬP NHẬT & XÓA -->
+    <!-- MODAL: DETAIL & UPDATE & DELETE -->
     <div id="detailModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 modal-base">
         <div onclick="closeModal('detailModal')" class="absolute inset-0 bg-slate-900/60 backdrop-blur-md"></div>
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 modal-box overflow-hidden">
-            <div id="detailContent" class="p-10 space-y-6"></div>
-            <div class="p-8 bg-slate-50 border-t border-slate-100 flex flex-wrap gap-4">
+            <div id="detailContent" class="p-10 space-y-6">
+                <!-- Content loaded dynamically -->
+            </div>
+            <div class="p-8 bg-slate-50 border-t border-slate-100 flex gap-4">
                 <button onclick="confirmDelete()" id="btnDelete" class="w-12 h-12 flex items-center justify-center bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white rounded-2xl transition-all shadow-sm border border-rose-100"><i class="fas fa-trash-alt"></i></button>
-                <button onclick="closeModal('detailModal')" class="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600 text-sm">HỦY</button>
-                <button onclick="updateCandidate()" id="btnUpdate" class="flex-[3] bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 text-sm tracking-wide">CẬP NHẬT</button>
+                <button onclick="closeModal('detailModal')" class="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600 text-sm">ĐÓNG</button>
+                <button onclick="updateCandidate()" id="btnUpdate" class="flex-[3] bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 text-sm tracking-wide">CẬP NHẬT NHẬN XÉT</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: LỊCH TRÌNH -->
+    <!-- CALENDAR MODAL -->
     <div id="calendarModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-base">
         <div onclick="closeModal('calendarModal')" class="absolute inset-0 bg-slate-900/70 backdrop-blur-lg"></div>
         <div class="bg-white rounded-[3rem] shadow-2xl w-full max-w-5xl h-[85vh] relative z-10 modal-box overflow-hidden flex flex-col">
-            <div class="p-8 border-b border-slate-50 flex justify-between items-center"><h3 class="text-2xl font-black text-slate-900">Lịch phỏng vấn</h3><button onclick="closeModal('calendarModal')" class="w-12 h-12 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-slate-100"><i class="fas fa-times"></i></button></div>
+            <div class="p-8 border-b border-slate-50 flex justify-between items-center"><h3 class="text-2xl font-black text-slate-900">Lịch trình</h3><button onclick="closeModal('calendarModal')" class="w-12 h-12 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-slate-100"><i class="fas fa-times"></i></button></div>
             <div class="flex-1 p-8 overflow-y-auto" id="calendar"></div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- TOAST -->
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 translate-y-32 opacity-0 transition-all duration-500 bg-slate-900 text-white px-8 py-4 rounded-full z-[100] flex items-center shadow-2xl">
         <div id="toastIconBox" class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center mr-3"><i class="fas fa-check text-[10px]" id="toastIcon"></i></div>
-        <span id="toastMsg" class="font-bold text-sm">Thông báo</span>
+        <span id="toastMsg" class="font-bold text-sm">Hành động thành công</span>
     </div>
 
     <script>
@@ -216,28 +210,22 @@
         };
 
         async function fetchCandidates() {
+            const body = document.getElementById('candidateTableBody');
+            body.innerHTML = `<tr><td colspan="4" class="py-24 text-center"><div class="flex flex-col items-center"><div class="loader mb-4"></div><p class="text-slate-400 italic">Đang đồng bộ từ Google Sheets...</p></div></td></tr>`;
             try {
                 const res = await fetch(SHEETDB_URL);
                 allData = await res.json();
                 filterData();
             } catch (err) {
-                document.getElementById('candidateTableBody').innerHTML = `<tr><td colspan="4" class="py-10 text-center text-rose-500 font-bold italic">Lỗi kết nối máy chủ!</td></tr>`;
+                body.innerHTML = `<tr><td colspan="4" class="py-10 text-center text-rose-500 font-bold">Lỗi kết nối! Vui lòng kiểm tra lại API SheetDB.</td></tr>`;
             }
         }
 
         function filterData() {
             const pos = document.getElementById('filterPosition').value.toLowerCase();
-            const start = document.getElementById('filterStart').value;
-            const end = document.getElementById('filterEnd').value;
             displayData = allData.filter(c => {
                 const cPos = (c.vi_tri || '').toLowerCase();
-                const cDate = new Date(c.ngay_phong_van);
-                const sDate = start ? new Date(start) : null;
-                const eDate = end ? new Date(end) : null;
-                if (pos && !cPos.includes(pos)) return false;
-                if (sDate && cDate < sDate) return false;
-                if (eDate && cDate > eDate) return false;
-                return true;
+                return !pos || cPos.includes(pos);
             });
             renderUI();
         }
@@ -245,7 +233,7 @@
         function renderUI() {
             const body = document.getElementById('candidateTableBody');
             if (displayData.length === 0) {
-                body.innerHTML = `<tr><td colspan="4" class="py-20 text-center text-slate-400 font-medium italic">Không có ứng viên phù hợp</td></tr>`;
+                body.innerHTML = `<tr><td colspan="4" class="py-20 text-center text-slate-400 font-medium italic">Không có ứng viên nào</td></tr>`;
                 updateDashboard(0,0,0,0,0);
                 return;
             }
@@ -254,14 +242,24 @@
                 return `<tr class="hover:bg-slate-50/50 transition cursor-pointer group" onclick="openDetailModal('${c.email}')">
                     <td class="px-8 py-5">
                         <div class="font-bold text-slate-900">${c.ho_ten}</div>
-                        <div class="flex items-center gap-2 mt-1"><span class="bg-indigo-600 text-white text-[9px] px-2 py-0.5 rounded-md font-black uppercase tracking-widest">${c.vi_tri || 'N/A'}</span><span class="text-xs text-slate-400 font-medium">${c.email}</span></div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="bg-indigo-600 text-white text-[9px] px-2 py-0.5 rounded-md font-black uppercase tracking-widest">${c.vi_tri || 'N/A'}</span>
+                            <span class="text-xs text-slate-400 font-medium">${c.email}</span>
+                        </div>
                     </td>
                     <td class="px-8 py-5 text-center"><span class="text-sm font-bold text-slate-500 tabular-nums">${c.ngay_phong_van}</span></td>
-                    <td class="px-8 py-5 text-center"><span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-wider ${theme.bg} ${theme.text} ${theme.border}"><span class="w-1.5 h-1.5 rounded-full ${theme.dot}"></span>${c.trang_thai || 'Chưa PV'}</span></td>
-                    <td class="px-8 py-5 text-right"><button class="w-10 h-10 rounded-xl bg-slate-50 text-slate-300 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 flex items-center justify-center ml-auto"><i class="fas fa-chevron-right text-xs"></i></button></td>
+                    <td class="px-8 py-5 text-center"><span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-wider ${theme.bg} ${theme.text} ${theme.border}"><span class="w-1.5 h-1.5 rounded-full ${theme.dot}"></span>${c.trang_thai || 'Mới'}</span></td>
+                    <td class="px-8 py-5 text-right"><button class="w-10 h-10 rounded-xl bg-slate-50 text-slate-300 group-hover:bg-indigo-600 group-hover:text-white transition-all flex items-center justify-center ml-auto"><i class="fas fa-chevron-right text-xs"></i></button></td>
                 </tr>`;
             }).join('');
-            updateDashboard(displayData.length, displayData.filter(d => d.trang_thai === 'Đã phỏng vấn').length, displayData.filter(d => d.trang_thai === 'Phù hợp').length, displayData.filter(d => d.trang_thai === 'Đang xem xét').length, displayData.filter(d => d.trang_thai === 'Không phù hợp').length);
+
+            updateDashboard(
+                allData.length,
+                allData.filter(d => d.trang_thai === 'Đã phỏng vấn').length,
+                allData.filter(d => d.trang_thai === 'Phù hợp').length,
+                allData.filter(d => d.trang_thai === 'Đang xem xét').length,
+                allData.filter(d => d.trang_thai === 'Không phù hợp').length
+            );
             document.getElementById('resultCount').innerText = `${displayData.length} ứng viên`;
             if (fcCalendar) refreshCalendar();
         }
@@ -274,19 +272,36 @@
             document.getElementById('statRejected').innerText = r;
         }
 
-        function openCandidateModal() { document.getElementById('candidateModal').classList.add('visible-custom'); document.getElementById('dateInput').valueAsDate = new Date(); }
+        function openCandidateModal() {
+            document.getElementById('candidateModal').classList.add('visible-custom');
+            document.getElementById('dateInput').valueAsDate = new Date();
+        }
+
         function closeModal(id) { document.getElementById(id).classList.remove('visible-custom'); }
 
         document.getElementById('candidateForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSubmit');
-            btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Đang thêm...`;
-            const data = Object.fromEntries(new FormData(e.target).entries());
+            btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Đang gửi...`;
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
             data.trang_thai = "Chưa phỏng vấn";
+
             try {
-                await fetch(SHEETDB_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: [data] }) });
-                showToast('Thêm ứng viên thành công!'); closeModal('candidateModal'); e.target.reset(); fetchCandidates();
-            } catch (err) { showToast('Lỗi khi thêm ứng viên!', 'error'); } finally { btn.disabled = false; btn.innerText = 'Thêm ứng viên'; }
+                await fetch(SHEETDB_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: [data] })
+                });
+                showToast('Đã thêm hồ sơ ứng viên thành công!');
+                closeModal('candidateModal');
+                e.target.reset();
+                fetchCandidates();
+            } catch (err) {
+                showToast('Lỗi gửi dữ liệu!', 'error');
+            } finally {
+                btn.disabled = false; btn.innerText = 'Lưu hồ sơ';
+            }
         });
 
         function openDetailModal(email) {
@@ -296,33 +311,69 @@
             const theme = getStatusTheme(c.trang_thai);
             document.getElementById('detailModal').classList.add('visible-custom');
             document.getElementById('detailContent').innerHTML = `
-                <div class="flex items-center gap-6"><div class="w-20 h-20 rounded-3xl flex items-center justify-center text-white text-3xl font-black shadow-lg" style="background: ${theme.hex}">${c.ho_ten.charAt(0)}</div><div><h2 class="text-3xl font-black text-slate-900">${c.ho_ten}</h2><div class="mt-2"><span class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-xl text-xs font-black uppercase tracking-widest">${c.vi_tri || 'N/A'}</span></div></div></div>
-                <div class="grid grid-cols-2 gap-4"><div class="p-5 bg-slate-50 rounded-3xl border border-slate-100"><p class="text-[10px] font-black text-slate-400 uppercase mb-1">Email</p><p class="font-bold text-slate-700 truncate">${c.email}</p></div><div class="p-5 bg-slate-50 rounded-3xl border border-slate-100"><p class="text-[10px] font-black text-slate-400 uppercase mb-1">SĐT</p><p class="font-bold text-slate-700">${c.sdt}</p></div></div>
-                <div class="grid grid-cols-2 gap-4"><div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Ngày PV</label><input type="date" id="upDate" value="${c.ngay_phong_van}" class="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 outline-none"></div><div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Đánh giá</label><select id="upStatus" class="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl font-bold text-slate-700 outline-none"><option value="Chưa phỏng vấn" ${c.trang_thai === 'Chưa phỏng vấn' ? 'selected' : ''}>Chưa PV</option><option value="Đã phỏng vấn" ${c.trang_thai === 'Đã phỏng vấn' ? 'selected' : ''}>Đã PV</option><option value="Phù hợp" ${c.trang_thai === 'Phù hợp' ? 'selected' : ''}>Phù hợp</option><option value="Không phù hợp" ${c.trang_thai === 'Không phù hợp' ? 'selected' : ''}>Loại</option><option value="Đang xem xét" ${c.trang_thai === 'Đang xem xét' ? 'selected' : ''}>Đang xét</option></select></div></div>
-                <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Nhận xét chi tiết</label><textarea id="upNote" rows="4" class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-3xl font-medium text-slate-600 outline-none" placeholder="Nhận xét...">${c.ghi_chu || ''}</textarea></div>`;
+                <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 rounded-3xl flex items-center justify-center text-white text-2xl font-black shadow-lg" style="background: ${theme.hex}">${c.ho_ten.charAt(0)}</div>
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-900">${c.ho_ten}</h2>
+                        <span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest mt-1 inline-block">${c.vi_tri || 'N/A'}</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100"><p class="text-[9px] font-black text-slate-400 uppercase mb-1">Email</p><p class="font-bold text-slate-700 text-xs truncate">${c.email}</p></div>
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100"><p class="text-[9px] font-black text-slate-400 uppercase mb-1">SĐT</p><p class="font-bold text-slate-700 text-xs">${c.sdt}</p></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Ngày PV</label><input type="date" id="upDate" value="${c.ngay_phong_van}" class="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 outline-none"></div>
+                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase ml-2">Trạng thái</label><select id="upStatus" class="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl font-bold text-slate-700 outline-none"><option value="Chưa phỏng vấn" ${c.trang_thai === 'Chưa phỏng vấn' ? 'selected' : ''}>Chưa PV</option><option value="Đã phỏng vấn" ${c.trang_thai === 'Đã phỏng vấn' ? 'selected' : ''}>Đã PV</option><option value="Phù hợp" ${c.trang_thai === 'Phù hợp' ? 'selected' : ''}>Phù hợp</option><option value="Không phù hợp" ${c.trang_thai === 'Không phù hợp' ? 'selected' : ''}>Loại</option><option value="Đang xem xét" ${c.trang_thai === 'Đang xem xét' ? 'selected' : ''}>Đang xét</option></select></div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black text-slate-400 uppercase ml-2">Nhận xét & Ghi chú (Cột cuối sheet)</label>
+                    <textarea id="upNote" rows="4" class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-3xl font-medium text-slate-600 outline-none" placeholder="Nhập nhận xét sau phỏng vấn tại đây...">${c.ghi_chu || ''}</textarea>
+                </div>
+            `;
         }
 
         async function updateCandidate() {
             if (!currentEmail) return;
-            const btn = document.getElementById('btnUpdate'); btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Đang lưu...`;
-            const data = { ngay_phong_van: document.getElementById('upDate').value, trang_thai: document.getElementById('upStatus').value, ghi_chu: document.getElementById('upNote').value };
+            const btn = document.getElementById('btnUpdate');
+            btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Đang lưu...`;
+            const data = {
+                ngay_phong_van: document.getElementById('upDate').value,
+                trang_thai: document.getElementById('upStatus').value,
+                ghi_chu: document.getElementById('upNote').value
+            };
             try {
-                await fetch(`${SHEETDB_URL}/email/${encodeURIComponent(currentEmail)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data }) });
-                showToast('Đã cập nhật thay đổi!'); closeModal('detailModal'); fetchCandidates();
-            } catch (e) { showToast('Lỗi khi cập nhật!', 'error'); } finally { btn.disabled = false; btn.innerText = 'CẬP NHẬT'; }
+                await fetch(`${SHEETDB_URL}/email/${encodeURIComponent(currentEmail)}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data })
+                });
+                showToast('Cập nhật nhận xét thành công!');
+                closeModal('detailModal');
+                fetchCandidates();
+            } catch (e) {
+                showToast('Lỗi cập nhật!', 'error');
+            } finally {
+                btn.disabled = false; btn.innerText = 'CẬP NHẬT NHẬN XÉT';
+            }
         }
 
         async function confirmDelete() {
-            if (!currentEmail) return;
-            if (confirm(`Bạn có chắc chắn muốn xóa hồ sơ của ứng viên có email: ${currentEmail}?`)) {
-                const btn = document.getElementById('btnDelete');
-                btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
-                try {
-                    await fetch(`${SHEETDB_URL}/email/${encodeURIComponent(currentEmail)}`, { method: 'DELETE' });
-                    showToast('Đã xóa hồ sơ ứng viên!', 'success');
-                    closeModal('detailModal');
-                    fetchCandidates();
-                } catch (e) { showToast('Lỗi khi xóa hồ sơ!', 'error'); } finally { btn.disabled = false; btn.innerHTML = `<i class="fas fa-trash-alt"></i>`; }
+            if (!currentEmail || !confirm(`Xác nhận xóa hồ sơ: ${currentEmail}?`)) return;
+            const btn = document.getElementById('btnDelete');
+            btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+            try {
+                await fetch(`${SHEETDB_URL}/email/${encodeURIComponent(currentEmail)}`, { method: 'DELETE' });
+                showToast('Đã xóa hồ sơ khỏi danh sách!');
+                closeModal('detailModal');
+                fetchCandidates();
+            } catch (e) {
+                showToast('Lỗi khi xóa!', 'error');
+            } finally {
+                btn.disabled = false; btn.innerHTML = `<i class="fas fa-trash-alt"></i>`;
             }
         }
 
@@ -333,8 +384,7 @@
                     fcCalendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
                         initialView: 'dayGridMonth', locale: 'vi',
                         headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
-                        buttonText: { today: 'Hôm nay', month: 'Tháng', week: 'Tuần' },
-                        events: displayData.map(c => ({ title: `[${c.vi_tri || '?'}] ${c.ho_ten}`, start: c.ngay_phong_van, backgroundColor: getStatusTheme(c.trang_thai).hex, extendedProps: { email: c.email } })),
+                        events: displayData.map(c => ({ title: c.ho_ten, start: c.ngay_phong_van, backgroundColor: getStatusTheme(c.trang_thai).hex, extendedProps: { email: c.email } })),
                         eventClick: (info) => openDetailModal(info.event.extendedProps.email)
                     });
                 } else { refreshCalendar(); }
@@ -344,7 +394,7 @@
 
         function refreshCalendar() {
             fcCalendar.removeAllEvents();
-            fcCalendar.addEventSource(displayData.map(c => ({ title: `[${c.vi_tri || '?'}] ${c.ho_ten}`, start: c.ngay_phong_van, backgroundColor: getStatusTheme(c.trang_thai).hex, extendedProps: { email: c.email } })));
+            fcCalendar.addEventSource(displayData.map(c => ({ title: c.ho_ten, start: c.ngay_phong_van, backgroundColor: getStatusTheme(c.trang_thai).hex, extendedProps: { email: c.email } })));
         }
 
         function showToast(msg, type = 'success') {
@@ -353,10 +403,15 @@
             const box = document.getElementById('toastIconBox');
             if (type === 'error') { box.classList.replace('bg-emerald-500', 'bg-rose-500'); document.getElementById('toastIcon').className = 'fas fa-exclamation text-[10px]'; } 
             else { box.classList.replace('bg-rose-500', 'bg-emerald-500'); document.getElementById('toastIcon').className = 'fas fa-check text-[10px]'; }
-            t.classList.remove('translate-y-32', 'opacity-0'); setTimeout(() => t.classList.add('translate-y-32', 'opacity-0'), 3000);
+            t.classList.remove('translate-y-32', 'opacity-0');
+            setTimeout(() => t.classList.add('translate-y-32', 'opacity-0'), 3000);
         }
 
-        function resetFilters() { document.getElementById('filterPosition').value = ''; document.getElementById('filterStart').value = ''; document.getElementById('filterEnd').value = ''; filterData(); }
+        function resetFilters() {
+            document.getElementById('filterPosition').value = '';
+            filterData();
+        }
+
         window.onload = fetchCandidates;
     </script>
 </body>
